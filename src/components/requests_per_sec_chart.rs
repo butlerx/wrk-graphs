@@ -34,7 +34,7 @@ fn metric_row(props: &MetricRowProps) -> Html {
     let formatted_value = if *value >= 1000.0 {
         format!("{:.2}k", value / 1000.0)
     } else {
-        format!("{:.2}", value)
+        format!("{value:.2}")
     };
     html! {
         <div class="metric-row">

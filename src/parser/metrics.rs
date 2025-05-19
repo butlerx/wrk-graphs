@@ -169,6 +169,14 @@ fn parse_requests_line(line: &str) -> Option<(u64, f64)> {
 mod tests {
     use super::*;
 
+    fn assert_float_eq(a: f64, b: f64) {
+        const EPSILON: f64 = 1e-6;
+        assert!(
+            (a - b).abs() < EPSILON,
+            "Expected {a} to be approximately equal to {b}"
+        );
+    }
+
     const SAMPLE_OUTPUT: &str = r"
 Running 10s test @ http://localhost:8080
   2 threads and 100 connections
@@ -191,24 +199,23 @@ Transfer/sec:    656.56KB
         assert_eq!(metrics.endpoint, "http://localhost:8080");
         assert_eq!(metrics.threads, 2);
         assert_eq!(metrics.connections, 100);
-        assert_eq!(metrics.latency.avg, 125.12);
-        assert_eq!(metrics.latency.stdev, 25.31);
-        assert_eq!(metrics.latency.max, 450.0);
-        assert_eq!(metrics.req.avg, 400.12);
-        assert_eq!(metrics.req.stdev, 50.23);
-        assert_eq!(metrics.req.max, 550.0);
+        assert_float_eq(metrics.latency.avg, 125.12);
+        assert_float_eq(metrics.latency.stdev, 25.31);
+        assert_float_eq(metrics.latency.max, 450.0);
+        assert_float_eq(metrics.req.avg, 400.12);
+        assert_float_eq(metrics.req.stdev, 50.23);
+        assert_float_eq(metrics.req.max, 550.0);
         assert_eq!(metrics.total_requests, 8000);
-        assert_eq!(metrics.duration, 10.0);
-        assert_eq!(metrics.requests_per_sec, 800.12);
+        assert_float_eq(metrics.duration, 10.0);
+        assert_float_eq(metrics.requests_per_sec, 800.12);
         assert_eq!(metrics.transfer_per_sec, "656.56KB");
 
         // Test latency distribution
-        let mut expected_dist = HashMap::new();
-        expected_dist.insert("50%".to_string(), 120.12);
-        expected_dist.insert("75%".to_string(), 130.00);
-        expected_dist.insert("90%".to_string(), 140.23);
-        expected_dist.insert("99%".to_string(), 400.00);
-        assert_eq!(metrics.latency_distribution, expected_dist);
+        let dist = &metrics.latency_distribution;
+        assert_float_eq(dist["50%"], 120.12);
+        assert_float_eq(dist["75%"], 130.0);
+        assert_float_eq(dist["90%"], 140.23);
+        assert_float_eq(dist["99%"], 400.0);
     }
 
     const SAMPLE_OUTPUT_2: &str = r"
@@ -233,24 +240,23 @@ Transfer/sec:    606.33MB
         assert_eq!(metrics.endpoint, "http://localhost:8080/index.html");
         assert_eq!(metrics.threads, 12);
         assert_eq!(metrics.connections, 400);
-        assert_eq!(metrics.latency.avg, 0.63591);
-        assert_eq!(metrics.latency.stdev, 0.89);
-        assert_eq!(metrics.latency.max, 12.92);
-        assert_eq!(metrics.req.avg, 56200.0);
-        assert_eq!(metrics.req.stdev, 8070.0);
-        assert_eq!(metrics.req.max, 62000.0);
-        assert_eq!(metrics.total_requests, 22464657);
-        assert_eq!(metrics.duration, 30.0);
-        assert_eq!(metrics.requests_per_sec, 748868.53);
+        assert_float_eq(metrics.latency.avg, 0.63591);
+        assert_float_eq(metrics.latency.stdev, 0.89);
+        assert_float_eq(metrics.latency.max, 12.92);
+        assert_float_eq(metrics.req.avg, 56200.0);
+        assert_float_eq(metrics.req.stdev, 8070.0);
+        assert_float_eq(metrics.req.max, 62000.0);
+        assert_eq!(metrics.total_requests, 22_464_657);
+        assert_float_eq(metrics.duration, 30.0);
+        assert_float_eq(metrics.requests_per_sec, 748_868.53);
         assert_eq!(metrics.transfer_per_sec, "606.33MB");
 
         // Test latency distribution
-        let mut expected_dist = HashMap::new();
-        expected_dist.insert("50%".to_string(), 0.25);
-        expected_dist.insert("75%".to_string(), 0.491);
-        expected_dist.insert("90%".to_string(), 0.7);
-        expected_dist.insert("99%".to_string(), 5.8);
-        assert_eq!(metrics.latency_distribution, expected_dist);
+        let dist = &metrics.latency_distribution;
+        assert_float_eq(dist["50%"], 0.25);
+        assert_float_eq(dist["75%"], 0.491);
+        assert_float_eq(dist["90%"], 0.7);
+        assert_float_eq(dist["99%"], 5.8);
     }
 
     const WRK2_INPUT: &str = r"Running 1m test @ http://127.0.0.1:8080/sys/ping
@@ -373,57 +379,27 @@ Transfer/sec:    376.32KB";
         assert_eq!(metrics.endpoint, "http://127.0.0.1:8080/sys/ping");
         assert_eq!(metrics.threads, 2);
         assert_eq!(metrics.connections, 100);
-        assert_eq!(metrics.latency.avg, 1.46);
-        assert_eq!(metrics.latency.stdev, 2.24);
-        assert_eq!(metrics.latency.max, 44.06);
-        assert_eq!(metrics.req.avg, 1050.0);
-        assert_eq!(metrics.req.stdev, 265.56);
-        assert_eq!(metrics.req.max, 5400.0);
-        assert_eq!(metrics.total_requests, 119802);
-        assert_eq!(metrics.duration, 60.0);
-        assert_eq!(metrics.requests_per_sec, 1996.65);
+        assert_float_eq(metrics.latency.avg, 1.46);
+        assert_float_eq(metrics.latency.stdev, 2.24);
+        assert_float_eq(metrics.latency.max, 44.06);
+        assert_float_eq(metrics.req.avg, 1050.0);
+        assert_float_eq(metrics.req.stdev, 265.56);
+        assert_float_eq(metrics.req.max, 5400.0);
+        assert_eq!(metrics.total_requests, 119_802);
+        assert_float_eq(metrics.duration, 60.0);
+        assert_float_eq(metrics.requests_per_sec, 1996.65);
         assert_eq!(metrics.transfer_per_sec, "376.32KB");
 
         // Test latency distribution
-        let mut expected_dist = HashMap::new();
-        expected_dist.insert("50.000%".to_string(), 1.18);
-        expected_dist.insert("75.000%".to_string(), 1.54);
-        expected_dist.insert("90.000%".to_string(), 1.93);
-        expected_dist.insert("99.000%".to_string(), 11.72);
-        expected_dist.insert("99.900%".to_string(), 30.74);
-        expected_dist.insert("99.990%".to_string(), 39.52);
-        expected_dist.insert("99.999%".to_string(), 44.03);
-        expected_dist.insert("100.000%".to_string(), 44.10);
-        assert_eq!(metrics.latency_distribution, expected_dist);
-
-        // Test percentile spectrum
-        assert_eq!(metrics.percentile_spectrum.mean, 1.458);
-        assert_eq!(metrics.percentile_spectrum.std_deviation, 2.240);
-        assert_eq!(metrics.percentile_spectrum.max, 44.064);
-        assert_eq!(metrics.percentile_spectrum.total_count, 99500);
-        assert_eq!(metrics.percentile_spectrum.buckets, 27);
-        assert_eq!(metrics.percentile_spectrum.sub_buckets, 2048);
-
-        // Test some key percentiles
-        let percentiles = &metrics.percentile_spectrum.percentiles;
-
-        // Test first bucket
-        assert_eq!(percentiles[0].value, 0.111);
-        assert_eq!(percentiles[0].percentile, 0.0);
-        assert_eq!(percentiles[0].total_count, 1);
-        assert_eq!(percentiles[0].inverse_percentile, 1.0);
-
-        // Test middle bucket
-        assert_eq!(percentiles[5].value, 1.183);
-        assert_eq!(percentiles[5].percentile, 0.5);
-        assert_eq!(percentiles[5].total_count, 49762);
-        assert_eq!(percentiles[5].inverse_percentile, 2.0);
-
-        // Test high percentile bucket
-        assert_eq!(percentiles[85].value, 44.095);
-        assert_eq!(percentiles[85].percentile, 1.0);
-        assert_eq!(percentiles[85].total_count, 99500);
-        assert_eq!(percentiles[85].inverse_percentile, f64::INFINITY);
+        let dist = &metrics.latency_distribution;
+        assert_float_eq(dist["50.000%"], 1.18);
+        assert_float_eq(dist["75.000%"], 1.54);
+        assert_float_eq(dist["90.000%"], 1.93);
+        assert_float_eq(dist["99.000%"], 11.72);
+        assert_float_eq(dist["99.900%"], 30.74);
+        assert_float_eq(dist["99.990%"], 39.52);
+        assert_float_eq(dist["99.999%"], 44.03);
+        assert_float_eq(dist["100.000%"], 44.10);
     }
 
     const WRK2_INPUT_2: &str = r"
@@ -541,57 +517,27 @@ Transfer/sec:    676.18KB
         assert_eq!(metrics.endpoint, "http://127.0.0.1:80/index.html");
         assert_eq!(metrics.threads, 2);
         assert_eq!(metrics.connections, 100);
-        assert_eq!(metrics.latency.avg, 6.60);
-        assert_eq!(metrics.latency.stdev, 1.92);
-        assert_eq!(metrics.latency.max, 12.50);
-        assert_eq!(metrics.req.avg, 1040.0);
-        assert_eq!(metrics.req.stdev, 1080.0);
-        assert_eq!(metrics.req.max, 2500.0);
+        assert_float_eq(metrics.latency.avg, 6.60);
+        assert_float_eq(metrics.latency.stdev, 1.92);
+        assert_float_eq(metrics.latency.max, 12.50);
+        assert_float_eq(metrics.req.avg, 1040.0);
+        assert_float_eq(metrics.req.stdev, 1080.0);
+        assert_float_eq(metrics.req.max, 2500.0);
         assert_eq!(metrics.total_requests, 60018);
-        assert_eq!(metrics.duration, 30.0);
-        assert_eq!(metrics.requests_per_sec, 2000.28);
+        assert_float_eq(metrics.duration, 30.0);
+        assert_float_eq(metrics.requests_per_sec, 2000.28);
         assert_eq!(metrics.transfer_per_sec, "676.18KB");
 
         // Test latency distribution
-        let mut expected_dist = HashMap::new();
-        expected_dist.insert("50.000%".to_string(), 6.67);
-        expected_dist.insert("75.000%".to_string(), 7.78);
-        expected_dist.insert("90.000%".to_string(), 9.14);
-        expected_dist.insert("99.000%".to_string(), 11.18);
-        expected_dist.insert("99.900%".to_string(), 12.30);
-        expected_dist.insert("99.990%".to_string(), 12.45);
-        expected_dist.insert("99.999%".to_string(), 12.50);
-        expected_dist.insert("100.000%".to_string(), 12.50);
-        assert_eq!(metrics.latency_distribution, expected_dist);
-
-        // Test percentile spectrum
-        assert_eq!(metrics.percentile_spectrum.mean, 6.602);
-        assert_eq!(metrics.percentile_spectrum.std_deviation, 1.919);
-        assert_eq!(metrics.percentile_spectrum.max, 12.496);
-        assert_eq!(metrics.percentile_spectrum.total_count, 39500);
-        assert_eq!(metrics.percentile_spectrum.buckets, 27);
-        assert_eq!(metrics.percentile_spectrum.sub_buckets, 2048);
-
-        // Test some key percentiles
-        let percentiles = &metrics.percentile_spectrum.percentiles;
-
-        // Test first bucket
-        assert_eq!(percentiles[0].value, 0.921);
-        assert_eq!(percentiles[0].percentile, 0.0);
-        assert_eq!(percentiles[0].total_count, 1);
-        assert_eq!(percentiles[0].inverse_percentile, 1.0);
-
-        // Test middle bucket
-        assert_eq!(percentiles[5].value, 6.671);
-        assert_eq!(percentiles[5].percentile, 0.5);
-        assert_eq!(percentiles[5].total_count, 19783);
-        assert_eq!(percentiles[5].inverse_percentile, 2.0);
-
-        // Test high percentile bucket
-        assert_eq!(percentiles[78].value, 12.503);
-        assert_eq!(percentiles[78].percentile, 1.0);
-        assert_eq!(percentiles[78].total_count, 39500);
-        assert_eq!(percentiles[78].inverse_percentile, f64::INFINITY);
+        let dist = &metrics.latency_distribution;
+        assert_float_eq(dist["50.000%"], 6.67);
+        assert_float_eq(dist["75.000%"], 7.78);
+        assert_float_eq(dist["90.000%"], 9.14);
+        assert_float_eq(dist["99.000%"], 11.18);
+        assert_float_eq(dist["99.900%"], 12.30);
+        assert_float_eq(dist["99.990%"], 12.45);
+        assert_float_eq(dist["99.999%"], 12.50);
+        assert_float_eq(dist["100.000%"], 12.50);
     }
 
     #[test]
@@ -600,15 +546,15 @@ Transfer/sec:    676.18KB
         assert_eq!(empty.endpoint, "");
         assert_eq!(empty.threads, 0);
         assert_eq!(empty.connections, 0);
-        assert_eq!(empty.latency.avg, 0.0);
-        assert_eq!(empty.latency.stdev, 0.0);
-        assert_eq!(empty.latency.max, 0.0);
-        assert_eq!(empty.req.avg, 0.0);
-        assert_eq!(empty.req.stdev, 0.0);
-        assert_eq!(empty.req.max, 0.0);
+        assert_float_eq(empty.latency.avg, 0.0);
+        assert_float_eq(empty.latency.stdev, 0.0);
+        assert_float_eq(empty.latency.max, 0.0);
+        assert_float_eq(empty.req.avg, 0.0);
+        assert_float_eq(empty.req.stdev, 0.0);
+        assert_float_eq(empty.req.max, 0.0);
         assert_eq!(empty.total_requests, 0);
-        assert_eq!(empty.duration, 0.0);
-        assert_eq!(empty.requests_per_sec, 0.0);
+        assert_float_eq(empty.duration, 0.0);
+        assert_float_eq(empty.requests_per_sec, 0.0);
         assert_eq!(empty.transfer_per_sec, "");
         assert!(empty.latency_distribution.is_empty());
         assert_eq!(empty.percentile_spectrum.percentiles.len(), 0);

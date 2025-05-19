@@ -14,9 +14,7 @@ pub fn not_found_page() -> Html {
                     </p>
                     <div class="error-actions">
                         <Link<Route> to={Route::Home} classes="home-link">
-                            <button class="primary-button">
-                                { "Return to Home" }
-                            </button>
+                            <button class="primary-button">{ "Return to Home" }</button>
                         </Link<Route>>
                     </div>
                 </div>

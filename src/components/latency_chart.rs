@@ -11,7 +11,11 @@ pub fn latency_chart(props: &ChartProps) -> Html {
     let metrics = &props.metrics;
 
     let mut latency_distribution: Vec<_> = metrics.latency_distribution.iter().collect();
-    latency_distribution.sort_by_key(|&(k, _)| k);
+    latency_distribution.sort_by(|a, b| {
+        parse_percent_float(a.0)
+            .partial_cmp(&parse_percent_float(b.0))
+            .expect("NaN values not allowed")
+    });
 
     html! {
         <div class="metric-panel panel-latency-stats">
@@ -31,11 +35,15 @@ pub fn latency_chart(props: &ChartProps) -> Html {
     }
 }
 
+fn parse_percent_float(key: &str) -> f64 {
+    key.trim_end_matches('%').parse().unwrap_or(0.0)
+}
+
 fn format_latency(value: f64) -> String {
     if value < 1.0 {
         format!("{:.2}us", value * 1000.0)
     } else {
-        format!("{:.2}ms", value)
+        format!("{value:.2}ms")
     }
 }
 

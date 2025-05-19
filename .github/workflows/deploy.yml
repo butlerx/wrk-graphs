@@ -31,13 +31,6 @@ jobs:
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: |
             ${{ runner.os }}-cargo-
-      - name: Cache Trunk
-        uses: actions/cache@v4
-        with:
-          path: ~/.cargo/bin/trunk
-          key: ${{ runner.os }}-trunk-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-trunk-
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
         with:
@@ -45,10 +38,9 @@ jobs:
           target: wasm32-unknown-unknown
           override: true
       - name: Install Trunk
-        if: steps.cache-trunk.outputs.cache-hit != 'true'
         run: cargo install trunk
       - name: Build Yew site with Trunk
-        run: trunk build --release
+        run: trunk build --public-url /${{ github.event.repository.name }}
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:

@@ -106,7 +106,11 @@ impl From<&[&str]> for PercentileSpectrum {
                             value: parts.first()?.parse().ok()?,
                             percentile: parts.get(1)?.parse().ok()?,
                             total_count: parts.get(2)?.parse().ok()?,
-                            inverse_percentile: parts.get(3)?.parse().ok()?,
+                            inverse_percentile: match parts.get(3) {
+                                Some(&"inf") => f64::INFINITY,
+                                Some(v) => v.parse().ok()?,
+                                None => 0.0,
+                            },
                         })
                     })
                     .collect();
@@ -123,6 +127,14 @@ impl From<&[&str]> for PercentileSpectrum {
 mod tests {
     use super::*;
 
+    fn assert_float_eq(a: f64, b: f64) {
+        const EPSILON: f64 = 1e-6;
+        assert!(
+            (a - b).abs() < EPSILON,
+            "Expected {a} to be approximately equal to {b}"
+        );
+    }
+
     const SAMPLE_SPECTRUM: &str = r"
 Detailed Percentile spectrum:
      Value   Percentile   TotalCount 1/(1-Percentile)
@@ -132,7 +144,7 @@ Detailed Percentile spectrum:
      4.935     0.200000         7921         1.25
      5.627     0.300000        11858         1.43
      6.179     0.400000        15803         1.67
-     6.671     0.500000        19783         2.00
+     6.671     0.500000        19783         inf
 #[Mean    =        6.602, StdDeviation   =        1.919]
 #[Max     =       12.496, Total count    =        39500]
 #[Buckets =           27, SubBuckets     =         2048]
@@ -143,23 +155,23 @@ Detailed Percentile spectrum:
         let lines: Vec<&str> = SAMPLE_SPECTRUM.lines().collect();
         let spectrum = PercentileSpectrum::from(lines.as_slice());
 
-        assert_eq!(spectrum.mean, 6.602);
-        assert_eq!(spectrum.std_deviation, 1.919);
-        assert_eq!(spectrum.max, 12.496);
+        assert_float_eq(spectrum.mean, 6.602);
+        assert_float_eq(spectrum.std_deviation, 1.919);
+        assert_float_eq(spectrum.max, 12.496);
         assert_eq!(spectrum.total_count, 39500);
         assert_eq!(spectrum.buckets, 27);
         assert_eq!(spectrum.sub_buckets, 2048);
 
         // Test first bucket
-        assert_eq!(spectrum.percentiles[0].value, 0.921);
-        assert_eq!(spectrum.percentiles[0].percentile, 0.0);
+        assert_float_eq(spectrum.percentiles[0].value, 0.921);
+        assert_float_eq(spectrum.percentiles[0].percentile, 0.0);
         assert_eq!(spectrum.percentiles[0].total_count, 1);
-        assert_eq!(spectrum.percentiles[0].inverse_percentile, 1.0);
+        assert_float_eq(spectrum.percentiles[0].inverse_percentile, 1.0);
 
         // Test middle bucket
-        assert_eq!(spectrum.percentiles[5].value, 6.671);
-        assert_eq!(spectrum.percentiles[5].percentile, 0.5);
+        assert_float_eq(spectrum.percentiles[5].value, 6.671);
+        assert_float_eq(spectrum.percentiles[5].percentile, 0.5);
         assert_eq!(spectrum.percentiles[5].total_count, 19783);
-        assert_eq!(spectrum.percentiles[5].inverse_percentile, 2.0);
+        assert_eq!(spectrum.percentiles[5].inverse_percentile, f64::INFINITY);
     }
 }

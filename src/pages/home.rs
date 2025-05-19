@@ -1,20 +1,21 @@
 use crate::{
     components::{ShareModal, WrkConfig},
+    pages::dashboard::Loadtest,
     parser, Route,
 };
 use base64::prelude::*;
 use yew::prelude::*;
 use yew_router::prelude::*;
 
-fn generate_hash(data: &str, description: &str, tags: Vec<String>) -> String {
-    let test_data = parser::WrkMetrics::from(data);
-    let data_obj = serde_json::json!({
-        "test_data": test_data,
-        "description": description,
-        "tags": tags
-    });
+fn generate_hash(data: &str, description: String, tags: Vec<String>) -> String {
+    let metrics = parser::WrkMetrics::from(data);
+    let data_obj = Loadtest {
+        metrics,
+        description,
+        tags,
+    };
 
-    let data_str = serde_json::to_string(&data_obj).unwrap_or_default();
+    let data_str = serde_json5::to_string(&data_obj).unwrap_or_default();
     BASE64_URL_SAFE_NO_PAD.encode(data_str)
 }
 
@@ -35,7 +36,7 @@ pub fn home_page() -> Html {
         let navigator = navigator.clone();
         Callback::from(
             move |(data, description, tags): (String, String, Vec<String>)| {
-                let hash = generate_hash(&data, &description, tags);
+                let hash = generate_hash(&data, description, tags);
                 navigator.push(&Route::Dashboard { hash });
             },
         )
@@ -50,7 +51,7 @@ pub fn home_page() -> Html {
 
     let on_close_modal = {
         let show_modal = show_modal.clone();
-        Callback::from(move |_| {
+        Callback::from(move |()| {
             show_modal.set(false);
         })
     };
@@ -70,5 +71,43 @@ pub fn home_page() -> Html {
                 <ShareModal on_close={on_close_modal} on_share={on_share} />
             }
         </div>
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_generate_hash() {
+        // Test data
+        let data = r"Running 10s test @ http://localhost:3000
+  2 threads and 10 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency     1.23ms    0.45ms   5.67ms   85.71%
+    Req/Sec     4.12k   456.78     5.00k    75.00%
+  82345 requests in 10.00s, 12.34MB read
+Requests/sec:   8234.50
+Transfer/sec:      1.23MB";
+        let description = "Test load test".to_string();
+        let tags = vec!["test".to_string(), "example".to_string()];
+
+        // Generate hash
+        let hash = generate_hash(data, description, tags);
+
+        // Verify the hash is not empty and is base64 URL-safe
+        assert!(!hash.is_empty());
+        assert!(!hash.contains('+'));
+        assert!(!hash.contains('/'));
+        assert!(!hash.contains('='));
+
+        // Verify the hash can be decoded back to valid JSON
+        let decoded = BASE64_URL_SAFE_NO_PAD.decode(&hash).unwrap();
+        let decoded_str = String::from_utf8(decoded).unwrap();
+        let json: Loadtest = serde_json5::from_str(&decoded_str).unwrap();
+
+        // Verify the decoded JSON contains our original data
+        assert!(json.description.as_str() == "Test load test");
+        assert!(json.tags.len() == 2);
     }
 }

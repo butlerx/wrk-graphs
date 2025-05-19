@@ -76,6 +76,7 @@ impl Component for ShareModal {
                         .tags
                         .split(',')
                         .map(|s| s.trim().to_string())
+                        .filter(|s| !s.is_empty())
                         .collect::<Vec<_>>();
                     ctx.props()
                         .on_share

@@ -1,5 +1,5 @@
 use crate::{
-    components::{LatencyChart, RequestsPerSecChart},
+    components::{LatencyChart, LatencyPercentileChart, RequestsPerSecChart},
     pages::NotFoundPage,
     parser,
 };
@@ -9,10 +9,10 @@ use wasm_bindgen::prelude::*;
 use yew::prelude::*;
 
 #[derive(Serialize, Deserialize, Clone, PartialEq)]
-struct TestData {
-    test_data: parser::WrkMetrics,
-    description: String,
-    tags: Vec<String>,
+pub struct Loadtest {
+    pub metrics: parser::WrkMetrics,
+    pub description: String,
+    pub tags: Vec<String>,
 }
 
 #[derive(Properties, PartialEq)]
@@ -20,31 +20,30 @@ pub struct DashboardProps {
     pub hash: String,
 }
 
-fn decode_dashboard(hash: &str) -> Option<TestData> {
-    let data = match BASE64_URL_SAFE_NO_PAD.decode(hash) {
-        Ok(data) => data,
-        Err(e) => {
-            log::error!("Failed to decode base64 hash {}: {}", hash, e);
-            return None;
-        }
-    };
+fn decode_dashboard(hash: &str) -> Option<Loadtest> {
+    let data = BASE64_URL_SAFE_NO_PAD.decode(hash).ok()?;
     let data_str = String::from_utf8(data).ok()?;
-    serde_json::from_str::<TestData>(&data_str).ok()
+    serde_json5::from_str::<Loadtest>(&data_str).ok()
 }
 
-fn format_requests(value: f64) -> String {
+fn format_requests(value: u64) -> String {
+    if value >= 1_000_000 {
+        format!("{:.2}M", value / 1_000_000)
+    } else if value >= 1_000 {
+        format!("{:.2}k", value / 1_000)
+    } else {
+        format!("{value:.2}")
+    }
+}
+
+fn format_requests_float(value: f64) -> String {
     if value >= 1_000_000.0 {
         format!("{:.2}M", value / 1_000_000.0)
     } else if value >= 1_000.0 {
         format!("{:.2}k", value / 1_000.0)
     } else {
-        format!("{:.2}", value)
+        format!("{value:.2}")
     }
-}
-
-fn format_data_transfer(value: &str) -> String {
-    // Assuming value is in format like "1.23MB" or "456.78KB"
-    value.to_string()
 }
 
 #[function_component(DashboardPage)]
@@ -81,7 +80,7 @@ pub fn dashboard_page(props: &DashboardProps) -> Html {
 
     match decode_dashboard(&hash) {
         Some(data) => {
-            let metrics = &data.test_data;
+            let metrics = &data.metrics;
             html! {
                 <div class="dashboard">
                     <header class="dashboard-header">
@@ -114,7 +113,7 @@ pub fn dashboard_page(props: &DashboardProps) -> Html {
                         <div class="metric-panel panel-requests-per-sec">
                             <div class="metric-content">
                                 <div class="main-value">
-                                    { format_requests(metrics.requests_per_sec) }
+                                    { format_requests_float(metrics.requests_per_sec) }
                                 </div>
                                 <div class="metric-label">{ "Requests per second" }</div>
                             </div>
@@ -123,7 +122,7 @@ pub fn dashboard_page(props: &DashboardProps) -> Html {
                         <div class="metric-panel panel-total-requests">
                             <div class="metric-content">
                                 <div class="main-value">
-                                    { format_requests(metrics.total_requests as f64) }
+                                    { format_requests(metrics.total_requests) }
                                 </div>
                                 <div class="metric-label">{ "Total requests" }</div>
                             </div>
@@ -132,7 +131,7 @@ pub fn dashboard_page(props: &DashboardProps) -> Html {
                         <div class="metric-panel panel-data-transferred">
                             <div class="metric-content">
                                 <div class="main-value">
-                                    { format_data_transfer(&metrics.transfer_per_sec) }
+                                    { metrics.transfer_per_sec.to_string() }
                                 </div>
                                 <div class="metric-label">{ "Data transferred" }</div>
                             </div>
@@ -154,21 +153,7 @@ pub fn dashboard_page(props: &DashboardProps) -> Html {
                         <RequestsPerSecChart metrics={metrics.clone()} />
                         <LatencyChart metrics={metrics.clone()} />
                         if !metrics.percentile_spectrum.percentiles.is_empty() {
-                            <div class="metric-panel panel-percentiles full-width">
-                                <h3>{ "Latency Percentiles" }</h3>
-                                <div class="metric-content">
-                                    <div class="percentile-grid">
-                                        { for metrics.percentile_spectrum.percentiles.iter().map(|p| {
-                                            html! {
-                                                <div class="percentile-item">
-                                                    <span class="percentile-label">{ format!("{:.3}%", p.percentile * 100.0) }</span>
-                                                    <span class="percentile-value">{ format_latency(p.value) }</span>
-                                                </div>
-                                            }
-                                        }) }
-                                    </div>
-                                </div>
-                            </div>
+                            <LatencyPercentileChart metrics={metrics.clone()} />
                         }
                     </div>
                     <div class="share-link">
@@ -191,13 +176,5 @@ pub fn dashboard_page(props: &DashboardProps) -> Html {
         None => {
             html! { <NotFoundPage /> }
         }
-    }
-}
-
-fn format_latency(value: f64) -> String {
-    if value < 1.0 {
-        format!("{:.2}us", value * 1000.0)
-    } else {
-        format!("{:.2}ms", value)
     }
 }
