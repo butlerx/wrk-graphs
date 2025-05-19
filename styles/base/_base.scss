@@ -1,0 +1,152 @@
+/* Reset */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  height: 100%;
+  -webkit-text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  min-height: 100%;
+  overflow-x: hidden;
+  background-color: var(--main-base-00);
+  color: var(--main-base-07);
+  font-family: var(--main-fonts);
+  font-size: 100%;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Remove default margin */
+body,
+h1,
+h2,
+h3,
+h4,
+p,
+figure,
+blockquote,
+dl,
+dd {
+  margin: 0;
+}
+
+/* Remove list styles on ul, ol elements */
+ul[class],
+ol[class] {
+  list-style: none;
+  padding: 0;
+}
+
+/* Set core root defaults */
+html:focus-within {
+  scroll-behavior: smooth;
+}
+
+/* Set core body defaults */
+body {
+  text-rendering: optimizeSpeed;
+  line-height: 1.5;
+}
+
+/* Make images easier to work with */
+img,
+picture {
+  max-width: 100%;
+  display: block;
+}
+
+/* Inherit fonts for inputs and buttons */
+input,
+button,
+textarea,
+select {
+  font: inherit;
+}
+
+/* Typography */
+h1 {
+  margin-bottom: 0.5em;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 1em;
+  font-size: 2rem;
+  font-weight: bold;
+  line-height: 1.25;
+}
+
+h2 {
+  margin-bottom: 0.5em;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 1em;
+  font-size: 1.5rem;
+  font-weight: bold;
+  line-height: 1.25;
+}
+
+h3 {
+  margin-bottom: 0.5em;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 1em;
+  font-size: 1.25rem;
+  font-weight: bold;
+  line-height: 1.25;
+}
+
+h4 {
+  margin-bottom: 0.5em;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 1em;
+  font-size: 1rem;
+  font-weight: bold;
+  line-height: 1.25;
+}
+
+p {
+  margin-bottom: 1rem;
+  margin-top: 0;
+}
+
+/* Container */
+.container {
+  max-width: var(--main-max-width);
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+@media (max-width: var(--main-max-width)) {
+  .container {
+    width: 100%;
+  }
+}
+
+@media (min-width: var(--main-max-width-lg)) {
+  .container {
+    max-width: 90%;
+  }
+}
+
+/* Remove all animations, transitions and smooth scroll for people that prefer not to see them */
+@media (prefers-reduced-motion: reduce) {
+  html:focus-within {
+    scroll-behavior: auto;
+  }
+  
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+} 

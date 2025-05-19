@@ -1,0 +1,16 @@
+{
+  "name": "WRK loadtest Results",
+  "short_name": "wrk",
+  "theme_color": "#2d2d2d",
+  "background_color": "#f2f0ec",
+  "display": "minimal-ui",
+  "scope": "/",
+  "start_url": "/wrk-graphs/",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "any",
+      "type": "image/png"
+    }
+  ]
+}

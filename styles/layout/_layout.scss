@@ -1,0 +1,93 @@
+/* Layout */
+.dashboard {
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  padding: var(--spacing-xl);
+
+  @media (max-width: 768px) {
+    padding: var(--spacing-md);
+  }
+}
+
+.dashboard-header {
+  margin-bottom: var(--spacing-xl);
+  padding-bottom: var(--spacing-md);
+  border-bottom: 1px solid var(--color-border);
+
+  h1 {
+    margin: 0 0 var(--spacing-md) 0;
+    font-size: 2.5rem;
+
+    @media (max-width: 768px) {
+      font-size: 1.8rem;
+    }
+  }
+}
+
+/* Grid Layout */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+
+  grid-template-areas:
+    'requests total latency_stats'
+    'transfer threads latency_stats'
+    'connections req_sec_chart  req_sec_chart'
+    'percentiles percentiles percentiles';
+
+  @media (max-width: 1024px) {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-areas:
+      'requests total'
+      'transfer latency_stats'
+      'threads latency_stats'
+      'connections latency_stats'
+      'req_sec_chart req_sec_chart'
+      'percentiles percentiles';
+  }
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md);
+    grid-template-areas:
+      'requests'
+      'total'
+      'transfer'
+      'latency_stats'
+      'threads'
+      'connections'
+      'req_sec_chart'
+      'percentiles';
+  }
+}
+
+/* Grid Area Assignments */
+.panel-requests-per-sec {
+  grid-area: requests;
+}
+.panel-total-requests {
+  grid-area: total;
+}
+.panel-data-transferred {
+  grid-area: transfer;
+}
+.panel-threads {
+  grid-area: threads;
+}
+.panel-connections {
+  grid-area: connections;
+}
+.panel-latency-stats {
+  grid-area: latency_stats;
+}
+.panel-requests-per-sec-stats {
+  grid-area: req_sec_chart;
+}
+.panel-latency-chart {
+  grid-area: latency_chart;
+}
+.panel-percentiles {
+  grid-area: percentiles;
+}
