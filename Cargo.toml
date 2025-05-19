@@ -1,0 +1,38 @@
+[package]
+name = "wrk_graphs"
+version = "0.1.0"
+edition = "2021"
+description = "A web application for visualizing and sharing load testing results."
+readme = "README.md"
+repository = "https://github.com/butlerx/wrk-graphs"
+license = "Apache-2.0"
+authors = ["Cian Butler <butlerx@notthe.cloud>"]
+keywords = ["wrk", "loadtest", "yew", "rust", "web", "wasm"]
+categories = ["wasm", "web", "loadtest", "graphs"]
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[dependencies]
+base64 = "0.22"
+gloo-file = "0.3"
+itertools = "0.14.0"
+js-sys = "0.3"
+log = "0.4"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror = "2"
+wasm-bindgen = "0.2"
+wasm-bindgen-futures = "0.4"
+wasm-logger = "0.2"
+web-sys = { version = "0.3", features = [
+  "Window",
+  "Document",
+  "HtmlElement",
+  "HtmlInputElement",
+  "Event",
+  "File",
+  "FileList",
+  "Navigator",
+  "Clipboard",
+] }
+yew = { version = "0.21", features = ["csr"] }
+yew-router = "0.18"
