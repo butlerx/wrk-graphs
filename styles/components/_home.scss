@@ -7,6 +7,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  background-color: var(--color-bg-primary);
 
   @media (max-width: 768px) {
     padding: var(--spacing-md);
@@ -33,6 +34,7 @@
   border-radius: var(--radius-md);
   padding: var(--spacing-xl);
   box-shadow: var(--shadow-sm);
+  color: var(--color-text-secondary-on-light);
 
   @media (max-width: 768px) {
     padding: var(--spacing-lg);
@@ -46,11 +48,11 @@
   .share-button {
     background-color: var(--color-accent);
     color: var(--color-text-primary);
-    border: none;
+    border: 2px solid var(--color-border);
     padding: var(--spacing-md) var(--spacing-xl);
     border-radius: var(--radius-sm);
     font-size: 1.1rem;
-    font-weight: 600;
+    font-weight: 700;
     cursor: pointer;
     transition: all var(--transition-fast);
 

@@ -26,30 +26,29 @@ pub fn latency_percentile_chart(props: &ChartProps) -> Html {
     html! {
         <div class="metric-panel panel-percentiles full-width">
             <h3>{ "Latency Percentiles" }</h3>
-            <div class="metric-content">
-                <div class="percentile-chart">
-                    <svg viewBox="0 0 800 400" class="chart-svg">
-                        // Main axes
-                        <line
-                            x1="50"
-                            y1="350"
-                            x2="750"
-                            y2="350"
-                            class="axis-line"
-                            stroke-width="3"
-                            stroke="#ffffff"
-                        />
-                        <line
-                            x1="50"
-                            y1="350"
-                            x2="50"
-                            y2="50"
-                            class="axis-line"
-                            stroke-width="3"
-                            stroke="#ffffff"
-                        />
-                        // Grid lines
-                        { for (0..=4).map(|i| {
+            <div class="percentile-chart">
+                <svg viewBox="0 0 800 400" class="chart-svg">
+                    // Main axes
+                    <line
+                        x1="50"
+                        y1="350"
+                        x2="750"
+                        y2="350"
+                        class="axis-line"
+                        stroke-width="3"
+                        stroke="#ffffff"
+                    />
+                    <line
+                        x1="50"
+                        y1="350"
+                        x2="50"
+                        y2="50"
+                        class="axis-line"
+                        stroke-width="3"
+                        stroke="#ffffff"
+                    />
+                    // Grid lines
+                    { for (0..=4).map(|i| {
                             let y = 50.0 + (f64::from(i) * 75.0);
                             html! {
                                 <>
@@ -66,7 +65,7 @@ pub fn latency_percentile_chart(props: &ChartProps) -> Html {
                                         y={y.to_string()}
                                         class="axis-label"
                                         text-anchor="end"
-                                        fill="white"
+                                        fill="black"
                                         font-size="10"
                                     >
                                         { format_latency((4.0 - f64::from(i)) * y_scale / 4.0) }
@@ -74,7 +73,7 @@ pub fn latency_percentile_chart(props: &ChartProps) -> Html {
                                 </>
                             }
                         }) }
-                        { for (0..=4).map(|i| {
+                    { for (0..=4).map(|i| {
                             let x = 50.0 + (f64::from(i) * 175.0);
                             html! {
                                 <>
@@ -91,7 +90,7 @@ pub fn latency_percentile_chart(props: &ChartProps) -> Html {
                                         y="370"
                                         class="axis-label"
                                         text-anchor="middle"
-                                        fill="white"
+                                        fill="black"
                                         font-size="10"
                                     >
                                         { format!("{}%", i * 25) }
@@ -99,8 +98,8 @@ pub fn latency_percentile_chart(props: &ChartProps) -> Html {
                                 </>
                             }
                         }) }
-                        // Data points and line
-                        { for percentiles.iter().map(|p| {
+                    // Data points and line
+                    { for percentiles.iter().map(|p| {
                             let x = 50.0 + (p.percentile * 700.0);
                             let y = 350.0 - (p.value / y_scale * 300.0);
                             html! {
@@ -113,8 +112,8 @@ pub fn latency_percentile_chart(props: &ChartProps) -> Html {
                                 />
                             }
                         }) }
-                        <path
-                            d={format!(
+                    <path
+                        d={format!(
                                 "M {} {}",
                                 percentiles.first().map(|p| {
                                     let x = 50.0 + (p.percentile * 700.0);
@@ -127,13 +126,12 @@ pub fn latency_percentile_chart(props: &ChartProps) -> Html {
                                     format!("L {x} {y}")
                                 }).collect::<Vec<_>>().join(" ")
                             )}
-                            class="percentile-line"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                        />
-                    </svg>
-                </div>
+                        class="percentile-line"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    />
+                </svg>
             </div>
         </div>
     }

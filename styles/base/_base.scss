@@ -1,5 +1,7 @@
 /* Reset */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -140,7 +142,7 @@ p {
   html:focus-within {
     scroll-behavior: auto;
   }
-  
+
   *,
   *::before,
   *::after {
@@ -149,4 +151,4 @@ p {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
-} 
+}

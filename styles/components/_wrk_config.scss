@@ -6,7 +6,7 @@
 
   h2 {
     margin: 0 0 var(--spacing-lg) 0;
-    color: var(--color-text-primary);
+    color: var(--color-text-on-light);
     font-size: 1.5rem;
   }
 
@@ -23,18 +23,17 @@
     gap: var(--spacing-xs);
 
     label {
-      color: var(--color-text-primary);
+      color: var(--color-text-on-light);
       font-weight: 500;
     }
 
-    input[type="text"],
-    input[type="number"] {
+    input[type='text'],
+    input[type='number'] {
       padding: var(--spacing-sm);
       border: 1px solid var(--color-border);
       border-radius: var(--radius-sm);
-      background: var(--color-bg-primary);
-      color: var(--color-text-primary);
-      font-family: var(--main-fonts);
+      background: var(--color-bg-tertiary);
+      color: var(--color-text-on-light);
       width: 100%;
 
       &:focus {
@@ -43,39 +42,38 @@
       }
     }
 
-    input[type="checkbox"] {
+    input[type='checkbox'] {
       width: 1.2rem;
       height: 1.2rem;
       margin: 0;
     }
 
     .help-text {
-      color: var(--color-text-secondary);
+      color: var(--color-text-secondary-on-light);
       font-size: 0.9rem;
       margin-top: var(--spacing-xs);
     }
   }
 
   .command-preview {
-    background: var(--color-bg-primary);
+    background: var(--color-bg-tertiary);
     border-radius: var(--radius-md);
     padding: var(--spacing-lg);
     margin-top: var(--spacing-lg);
 
     h3 {
       margin: 0 0 var(--spacing-md) 0;
-      color: var(--color-text-primary);
+      color: var(--color-text-on-light);
       font-size: 1.2rem;
     }
 
     pre {
-      background: var(--color-bg-tertiary);
+      background: var(--color-bg-secondary);
       padding: var(--spacing-md);
       border-radius: var(--radius-sm);
       margin: 0 0 var(--spacing-md) 0;
       overflow-x: auto;
-      font-family: var(--main-fonts);
-      color: var(--color-text-primary);
+      color: var(--color-text-on-light);
     }
 
     .copy-button {
@@ -84,7 +82,7 @@
       border: none;
       border-radius: var(--radius-sm);
       padding: var(--spacing-sm) var(--spacing-md);
-      font-weight: 500;
+      font-weight: 700;
       cursor: pointer;
       transition: all var(--transition-fast);
 
@@ -99,7 +97,7 @@
 
       &.copied {
         background: var(--color-bg-tertiary);
-        color: var(--color-text-secondary);
+        color: var(--color-text-secondary-on-light);
         cursor: default;
         transform: none;
 
@@ -110,4 +108,4 @@
       }
     }
   }
-} 
+}

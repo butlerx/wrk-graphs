@@ -1,15 +1,26 @@
 :root {
   /* Colors */
-  --color-bg-primary: #1a1a1a;
-  --color-bg-secondary: #2a2a2a;
-  --color-bg-tertiary: #3a3a3a;
-  --color-text-primary: #f0f0f0;
-  --color-text-secondary: #ccc;
-  --color-accent: #00c080;
-  --color-accent-hover: #00a060;
-  --color-border: #444;
-  --color-error: #e74c3c;
-  --color-link: #88b0e0;
+  --color-bg-primary: #333333; /* Dark background for header */
+  --color-bg-secondary: #ffffff; /* Light background for panels */
+  --color-bg-tertiary: #f8f8f8; /* Slightly darker light background */
+  --color-text-primary: #ffffff; /* White text for dark background */
+  --color-text-secondary: #cccccc; /* Light gray text for dark background */
+  --color-text-on-light: #000000; /* Black text for light background */
+  --color-text-secondary-on-light: #444444; /* Dark gray text for light background */
+  --color-accent: #ff6b6b; /* Pink/red accent */
+  --color-accent-hover: #ff5252; /* Darker pink/red */
+  --color-border: #000000; /* Black borders */
+  --color-error: #ff0000; /* Red error text */
+  --color-link: #0000ff; /* Blue links */
+
+  /* Graph Colors */
+  --graph-line-color: #000000; /* Black graph line */
+  --graph-point-color: #ff6b6b; /* Pink/red graph points */
+  --graph-grid-color: #cccccc; /* Light gray grid lines */
+  --graph-text-color: #000000; /* Black graph text */
+  --graph-background: #ffffff; /* White graph background */
+  --graph-axis-color: #000000; /* Black axis lines */
+  --graph-hover-color: #ff5252; /* Darker pink/red on hover */
 
   /* Spacing */
   --spacing-xs: 0.25rem;
@@ -19,19 +30,32 @@
   --spacing-xl: 2rem;
 
   /* Border Radius */
-  --radius-sm: 4px;
-  --radius-md: 8px;
-  --radius-lg: 1rem;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
 
   /* Shadows */
-  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.4);
+  --shadow-sm: 2px 2px 0 rgba(0, 0, 0, 0.2);
+  --shadow-md: 4px 4px 0 rgba(0, 0, 0, 0.2);
 
   /* Transitions */
   --transition-fast: 0.2s ease;
 
   /* Container */
   --container-max-width: 1200px;
+
+  /* xkcd specific colors (for reference) */
+  --xkcd-blue: #0000ff;
+  --xkcd-red: #ff0000;
+  --xkcd-green: #00ff00;
+  --xkcd-yellow: #ffff00;
+  --xkcd-purple: #800080;
+  --xkcd-orange: #ffa500;
+  --xkcd-pink: #ffc0cb;
+  --xkcd-brown: #8b4513;
+  --xkcd-gray: #808080;
+  --xkcd-black: #000000;
+  --xkcd-white: #ffffff;
 
   --main-base-00: #2d2d2d;
   --main-base-01: #393939;
@@ -51,5 +75,5 @@
   --main-base-0f: #d27b53;
   --main-max-width: 52em;
   --main-max-width-lg: 60em;
-  --main-fonts: "Source Code Pro", monospace;
+  --main-fonts: 'Source Code Pro', monospace;
 }

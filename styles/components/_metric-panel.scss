@@ -10,6 +10,7 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  color: var(--color-text-secondary-on-light);
 
   @media (max-width: 768px) {
     padding: var(--spacing-md);
@@ -23,7 +24,8 @@
   h3 {
     margin: 0 0 var(--spacing-md) 0;
     font-size: 1.2rem;
-    font-weight: 600;
+    font-weight: 700;
+    color: var(--color-text-on-light);
 
     @media (max-width: 768px) {
       font-size: 1.1rem;
@@ -35,7 +37,7 @@
     margin: var(--spacing-md) 0 var(--spacing-sm) 0;
     font-size: 1rem;
     font-weight: 600;
-    color: var(--color-text-secondary);
+    color: var(--color-text-secondary-on-light);
   }
 
   .metric-content {
@@ -62,7 +64,7 @@
     }
 
     .metric-label {
-      color: var(--color-text-secondary);
+      color: var(--color-text-secondary-on-light);
       font-size: 1rem;
       font-weight: 500;
 
@@ -72,9 +74,9 @@
     }
 
     .metric-value {
-      font-family: var(--font-mono);
       font-size: 1rem;
       font-weight: 600;
+      color: var(--color-text-on-light);
 
       @media (max-width: 768px) {
         font-size: 0.9rem;
@@ -85,19 +87,19 @@
 
 .metadata {
   margin-top: var(--spacing-md);
-  
+
   .metadata-row {
     display: flex;
     align-items: flex-start;
     margin-bottom: var(--spacing-sm);
-    
+
     &:last-child {
       margin-bottom: 0;
     }
   }
 
   .metadata-label {
-    color: var(--color-text-secondary);
+    color: var(--color-text-secondary-on-dark);
     font-weight: 600;
     min-width: 100px;
     margin-right: var(--spacing-sm);
@@ -105,7 +107,7 @@
 
   .metadata-value {
     flex: 1;
-    color: var(--color-text-primary);
+    color: var(--color-text-on-dark);
   }
 
   .tag-list {
@@ -116,8 +118,8 @@
   }
 
   .tag {
-    background: var(--color-bg-secondary);
-    color: var(--color-text-secondary);
+    background: var(--color-bg-tertiary);
+    color: var(--color-text-secondary-on-light);
     padding: 2px 8px;
     border-radius: var(--radius-sm);
     font-size: 0.9rem;
