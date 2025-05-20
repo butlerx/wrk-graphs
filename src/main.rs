@@ -5,25 +5,18 @@ use yew_router::prelude::*;
 
 mod components;
 mod pages;
-pub mod parser;
+mod parser;
+mod serialzer;
 
 #[derive(Clone, Routable, PartialEq)]
 pub enum Route {
     #[at("/")]
     Home,
-    #[at("/dashboard/:hash")]
-    Dashboard { hash: String },
+    #[at("/dashboard")]
+    Dashboard,
     #[not_found]
     #[at("/404")]
     NotFound,
-}
-
-fn switch(routes: Route) -> Html {
-    match routes {
-        Route::Home => html! { <HomePage /> },
-        Route::Dashboard { hash } => html! { <DashboardPage hash={hash} /> },
-        Route::NotFound => html! { <NotFoundPage /> },
-    }
 }
 
 #[function_component(App)]
@@ -31,7 +24,11 @@ pub fn app() -> Html {
     html! {
         <BrowserRouter>
             <main>
-                <Switch<Route> render={switch} />
+                <Switch<Route> render={|routes| match routes {
+                    Route::Home => html! { <HomePage /> },
+                    Route::Dashboard => html! { <DashboardPage /> },
+                    Route::NotFound => html! { <NotFoundPage /> },
+                }} />
             </main>
         </BrowserRouter>
     }

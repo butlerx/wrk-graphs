@@ -40,6 +40,7 @@ impl Component for ShareModal {
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             Msg::Files(files) => {
+                self.files_content.clear();
                 for file in files {
                     let file_name = file.name();
                     let task = {
@@ -103,6 +104,11 @@ impl Component for ShareModal {
             Msg::Files(selected_files)
         });
 
+        let on_textarea_change = ctx.link().callback(move |e: Event| {
+            let input: HtmlInputElement = e.target_unchecked_into();
+            Msg::LoadedText("manual_input".to_string(), input.value())
+        });
+
         let on_description_change = ctx.link().callback(move |e: Event| {
             let input: HtmlInputElement = e.target_unchecked_into();
             Msg::DescriptionChanged(input.value())
@@ -136,7 +142,7 @@ impl Component for ShareModal {
                                 id="test-data"
                                 rows="10"
                                 value={self.files_content.first().unwrap_or(&String::new()).clone()}
-                                onchange={&on_file_change}
+                                onchange={on_textarea_change}
                             />
                             <input type="file" onchange={on_file_change} multiple=false />
                         </div>

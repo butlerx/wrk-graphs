@@ -1,65 +1,53 @@
 use crate::{
     components::{LatencyChart, LatencyPercentileChart, RequestsPerSecChart},
-    pages::NotFoundPage,
-    parser,
+    serialzer::decode_dashboard,
+    Route,
 };
-use base64::prelude::*;
-use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
 use yew::prelude::*;
-
-#[derive(Serialize, Deserialize, Clone, PartialEq)]
-pub struct Loadtest {
-    pub metrics: parser::WrkMetrics,
-    pub description: String,
-    pub tags: Vec<String>,
-}
-
-#[derive(Properties, PartialEq)]
-pub struct DashboardProps {
-    pub hash: String,
-}
-
-fn decode_dashboard(hash: &str) -> Option<Loadtest> {
-    let data = BASE64_URL_SAFE_NO_PAD.decode(hash).ok()?;
-    let data_str = String::from_utf8(data).ok()?;
-    serde_json5::from_str::<Loadtest>(&data_str).ok()
-}
+use yew_router::prelude::*;
 
 fn format_requests(value: u64) -> String {
-    if value >= 1_000_000 {
-        format!("{:.2}M", value / 1_000_000)
-    } else if value >= 1_000 {
-        format!("{:.2}k", value / 1_000)
-    } else {
-        format!("{value:.2}")
+    match value {
+        v if v >= 1_000_000 => format!("{:.2}M", v / 1_000_000),
+        v if v >= 1_000 => format!("{:.2}k", v / 1_000),
+        _ => format!("{value:.2}"),
     }
 }
 
 fn format_requests_float(value: f64) -> String {
-    if value >= 1_000_000.0 {
-        format!("{:.2}M", value / 1_000_000.0)
-    } else if value >= 1_000.0 {
-        format!("{:.2}k", value / 1_000.0)
-    } else {
-        format!("{value:.2}")
+    match value {
+        v if v >= 1_000_000.0 => format!("{:.2}M", v / 1_000_000.0),
+        v if v >= 1_000.0 => format!("{:.2}k", v / 1_000.0),
+        _ => format!("{value:.2}"),
     }
 }
 
 #[function_component(DashboardPage)]
-pub fn dashboard_page(props: &DashboardProps) -> Html {
-    let hash = props.hash.clone();
+pub fn dashboard_page() -> Html {
+    let location = use_location().unwrap();
+    let navigator = use_navigator().unwrap();
+    let hash = location.hash().trim_start_matches('#');
     let copied = use_state(|| false);
+    let copied_embed = use_state(|| false);
+
+    let on_header_click = {
+        let navigator = navigator.clone();
+        Callback::from(move |_| {
+            navigator.push(&crate::Route::Home);
+        })
+    };
 
     let window = web_sys::window().expect("window will exist");
-    let url = format!(
-        "{}/dashboard/{}",
-        window.location().origin().unwrap(),
-        hash.clone()
+    let url = format!("{}/dashboard#{}", window.location().origin().unwrap(), hash);
+    let embed_code = format!(
+        "<iframe src=\"{url}\" width=\"100%\" height=\"600px\" frameborder=\"0\"></iframe>"
     );
 
     let on_copy = {
+        let window = window.clone();
         let copied = copied.clone();
+        let url = url.clone();
         Callback::from(move |_| {
             let _ = window.navigator().clipboard().write_text(&url);
 
@@ -78,18 +66,53 @@ pub fn dashboard_page(props: &DashboardProps) -> Html {
         })
     };
 
-    match decode_dashboard(&hash) {
-        Some(data) => {
+    let on_copy_embed = {
+        let window = window.clone();
+        let copied_embed = copied_embed.clone();
+        let embed_code = embed_code.clone();
+        Callback::from(move |_| {
+            let _ = window.navigator().clipboard().write_text(&embed_code);
+
+            copied_embed.set(true);
+
+            let window = window.clone();
+            let copied_embed = copied_embed.clone();
+            let closure = Closure::once(move || {
+                copied_embed.set(false);
+            });
+            let _ = window.set_timeout_with_callback_and_timeout_and_arguments_0(
+                closure.as_ref().unchecked_ref(),
+                2000,
+            );
+            closure.forget();
+        })
+    };
+
+    match decode_dashboard(hash) {
+        Ok(data) => {
             let metrics = &data.metrics;
             html! {
                 <div class="dashboard">
                     <header class="dashboard-header">
-                        <h1>{ "Load Test Results" }</h1>
+                        <div class="header-content">
+                            <div class="header-left" onclick={on_header_click}>
+                                <img src="./icon.png" alt="Logo" class="header-icon" />
+                                <h1>{ "Load Test Results" }</h1>
+                            </div>
+                            <div class="share-buttons">
+                                <button onclick={on_copy} class="share-button">
+                                    { if *copied { "Copied!" } else { "Copy URL" } }
+                                </button>
+                                <button onclick={on_copy_embed} class="share-button">
+                                    { if *copied_embed { "Copied!" } else { "Copy Embed Code" } }
+                                </button>
+                            </div>
+                        </div>
                         <div class="metadata">
-                            if !data.description.is_empty() {
+                            if let Some(description) = data.description {
                                 <div class="metadata-row">
                                     <span class="metadata-label">{ "Description:" }</span>
-                                    <span class="metadata-value">{ data.description }</span>
+                                    <span class="metadata-value">{ description }</span>
                                 </div>
                             }
                             if !metrics.endpoint.is_empty() {
@@ -156,25 +179,12 @@ pub fn dashboard_page(props: &DashboardProps) -> Html {
                             <LatencyPercentileChart metrics={metrics.clone()} />
                         }
                     </div>
-                    <div class="share-link">
-                        <h3>{ "Share this result" }</h3>
-                        <p>{ "Copy this URL to share these results:" }</p>
-                        <div class="copy-container">
-                            <input
-                                type="text"
-                                readonly=true
-                                value={format!("{}/dashboard/{}", web_sys::window().expect("window will exist").location().origin().unwrap(), props.hash)}
-                            />
-                            <button onclick={on_copy} class="copy-button">
-                                { if *copied { "Copied!" } else { "Copy" } }
-                            </button>
-                        </div>
-                    </div>
                 </div>
             }
         }
-        None => {
-            html! { <NotFoundPage /> }
+        Err(e) => {
+            log::error!("Failed to decode dashboard data: {}", e);
+            html! { <Redirect<Route> to={Route::Home}/>}
         }
     }
 }

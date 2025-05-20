@@ -1,37 +1,47 @@
-use super::{latency::Latency, percentile::PercentileSpectrum, request_sec::RequestSec, units};
+use super::{
+    is_empty, latency::Latency, percentile::PercentileSpectrum, request_sec::RequestSec, units,
+};
 use serde::{Deserialize, Serialize};
-use std::{collections::HashMap, fmt::Display, str::FromStr};
+use std::{collections::HashMap, str::FromStr};
 
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize, Default)]
 pub struct WrkMetrics {
+    #[serde(default, skip_serializing_if = "String::is_empty")]
     pub endpoint: String,
-    pub threads: u32,
-    pub connections: u32,
+    #[serde(default, skip_serializing_if = "is_empty::check_u64")]
+    pub threads: u64,
+    #[serde(default, skip_serializing_if = "is_empty::check_u64")]
+    pub connections: u64,
+    #[serde(default, skip_serializing_if = "Latency::is_empty")]
     pub latency: Latency,
-    pub latency_distribution: HashMap<String, f64>,
-    pub percentile_spectrum: PercentileSpectrum,
+    #[serde(default, skip_serializing_if = "RequestSec::is_empty")]
     pub req: RequestSec,
+    #[serde(default, skip_serializing_if = "is_empty::check_u64")]
     pub total_requests: u64,
+    #[serde(default, skip_serializing_if = "is_empty::check_f64")]
     pub duration: f64,
+    #[serde(default, skip_serializing_if = "is_empty::check_f64")]
     pub requests_per_sec: f64,
+    #[serde(default, skip_serializing_if = "String::is_empty")]
     pub transfer_per_sec: String,
+    #[serde(default, skip_serializing_if = "HashMap::is_empty")]
+    pub latency_distribution: HashMap<String, f64>,
+    #[serde(default, skip_serializing_if = "PercentileSpectrum::is_empty")]
+    pub percentile_spectrum: PercentileSpectrum,
 }
 
-impl Display for WrkMetrics {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "Endpoint: {}\nThreads: {}\nConnections: {}\nLatency: {:?}\nReq/Sec: {:?}\nTotal Requests: {}\nDuration: {}s\nRequests/sec: {}\nTransfer/sec: {}",
-            self.endpoint,
-            self.threads,
-            self.connections,
-            self.latency,
-            self.req,
-            self.total_requests,
-            self.duration,
-            self.requests_per_sec,
-            self.transfer_per_sec
-        )
+impl WrkMetrics {
+    pub fn is_empty(&self) -> bool {
+        is_empty::check_u64(&self.threads)
+            && is_empty::check_u64(&self.connections)
+            && self.latency.is_empty()
+            && self.req.is_empty()
+            && is_empty::check_u64(&self.total_requests)
+            && is_empty::check_f64(&self.duration)
+            && is_empty::check_f64(&self.requests_per_sec)
+            && self.transfer_per_sec.is_empty()
+            && self.latency_distribution.is_empty()
+            && self.percentile_spectrum.is_empty()
     }
 }
 
@@ -101,13 +111,13 @@ impl From<&str> for WrkMetrics {
             threads,
             connections,
             latency,
-            latency_distribution,
-            percentile_spectrum,
             req,
             total_requests,
             duration,
             requests_per_sec,
             transfer_per_sec,
+            latency_distribution,
+            percentile_spectrum,
         }
     }
 }

@@ -1,13 +1,21 @@
+use super::is_empty;
 use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize, Default)]
 pub struct PercentileSpectrum {
+    #[serde(default, skip_serializing_if = "is_empty::check_f64")]
     pub mean: f64,
+    #[serde(default, skip_serializing_if = "is_empty::check_f64")]
     pub std_deviation: f64,
+    #[serde(default, skip_serializing_if = "is_empty::check_f64")]
     pub max: f64,
+    #[serde(default, skip_serializing_if = "is_empty::check_u64")]
     pub total_count: u64,
+    #[serde(default, skip_serializing_if = "is_empty::check_u32")]
     pub buckets: u32,
+    #[serde(default, skip_serializing_if = "is_empty::check_u32")]
     pub sub_buckets: u32,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub percentiles: Vec<PercentileBucket>,
 }
 
@@ -19,17 +27,15 @@ pub struct PercentileBucket {
     pub inverse_percentile: f64,
 }
 
-impl Default for PercentileSpectrum {
-    fn default() -> Self {
-        PercentileSpectrum {
-            mean: 0.0,
-            std_deviation: 0.0,
-            max: 0.0,
-            total_count: 0,
-            buckets: 0,
-            sub_buckets: 0,
-            percentiles: Vec::new(),
-        }
+impl PercentileSpectrum {
+    pub fn is_empty(&self) -> bool {
+        is_empty::check_f64(&self.mean)
+            && is_empty::check_f64(&self.std_deviation)
+            && is_empty::check_f64(&self.max)
+            && is_empty::check_u64(&self.total_count)
+            && is_empty::check_u32(&self.buckets)
+            && is_empty::check_u32(&self.sub_buckets)
+            && self.percentiles.is_empty()
     }
 }
 

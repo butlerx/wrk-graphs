@@ -1,23 +1,25 @@
-use super::units;
+use super::{is_empty, units};
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize, Default)]
 pub struct RequestSec {
+    #[serde(default, skip_serializing_if = "is_empty::check_f64")]
     pub avg: f64,
+    #[serde(default, skip_serializing_if = "is_empty::check_f64")]
     pub stdev: f64,
+    #[serde(default, skip_serializing_if = "is_empty::check_f64")]
     pub max: f64,
+    #[serde(default, skip_serializing_if = "is_empty::check_f64")]
     pub stdev_percent: f64,
 }
 
-impl Default for RequestSec {
-    fn default() -> Self {
-        RequestSec {
-            avg: 0.0,
-            stdev: 0.0,
-            max: 0.0,
-            stdev_percent: 0.0,
-        }
+impl RequestSec {
+    pub fn is_empty(&self) -> bool {
+        is_empty::check_f64(&self.avg)
+            && is_empty::check_f64(&self.stdev)
+            && is_empty::check_f64(&self.max)
+            && is_empty::check_f64(&self.stdev_percent)
     }
 }
 

@@ -8,23 +8,13 @@
   align-items: center;
   justify-content: center;
   background-color: var(--color-bg-primary);
+}
 
-  @media (max-width: 768px) {
-    padding: var(--spacing-md);
-  }
-
-  h1 {
-    font-size: 3rem;
-    margin-bottom: var(--spacing-xl);
-    text-align: center;
-    color: var(--color-text-primary);
-    font-weight: 700;
-
-    @media (max-width: 768px) {
-      font-size: 2rem;
-      margin-bottom: var(--spacing-lg);
-    }
-  }
+.container h1 {
+  font-size: 3rem;
+  text-align: center;
+  color: var(--color-text-primary);
+  font-weight: 700;
 }
 
 .main-content {
@@ -35,40 +25,51 @@
   padding: var(--spacing-xl);
   box-shadow: var(--shadow-sm);
   color: var(--color-text-secondary-on-light);
-
-  @media (max-width: 768px) {
-    padding: var(--spacing-lg);
-  }
 }
 
 .share-section {
   margin-top: var(--spacing-xl);
   text-align: center;
+}
 
-  .share-button {
-    background-color: var(--color-accent);
-    color: var(--color-text-primary);
-    border: 2px solid var(--color-border);
-    padding: var(--spacing-md) var(--spacing-xl);
-    border-radius: var(--radius-sm);
-    font-size: 1.1rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all var(--transition-fast);
+.share-section .share-button {
+  background-color: var(--color-accent);
+  color: var(--color-text-primary);
+  border: 2px solid var(--color-border);
+  padding: var(--spacing-md) var(--spacing-xl);
+  border-radius: var(--radius-sm);
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
 
-    &:hover {
-      background-color: var(--color-accent-hover);
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-md);
-    }
+.share-section .share-button:hover {
+  background-color: var(--color-accent-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
 
-    &:active {
-      transform: translateY(0);
-    }
+.share-section .share-button:active {
+  transform: translateY(0);
+}
 
-    @media (max-width: 768px) {
-      padding: var(--spacing-sm) var(--spacing-lg);
-      font-size: 1rem;
-    }
+@media (max-width: 768px) {
+  .container {
+    padding: var(--spacing-md);
+  }
+
+  .container h1 {
+    font-size: 2rem;
+    margin-bottom: var(--spacing-lg);
+  }
+
+  .main-content {
+    padding: var(--spacing-lg);
+  }
+
+  .share-section .share-button {
+    padding: var(--spacing-sm) var(--spacing-lg);
+    font-size: 1rem;
   }
 }

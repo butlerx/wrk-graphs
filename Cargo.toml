@@ -13,12 +13,13 @@ categories = ["wasm", "web", "loadtest", "graphs"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [dependencies]
 base64 = "0.22"
+flate2 = "1"
 gloo-file = "0.3"
-itertools = "0.14.0"
+itertools = "0.14"
 js-sys = "0.3"
 log = "0.4"
+rmp-serde = "1.3"
 serde = { version = "1", features = ["derive"] }
-serde_json5 = "0.2"
 thiserror = "2"
 wasm-bindgen = "0.2"
 wasm-bindgen-futures = "0.4"
