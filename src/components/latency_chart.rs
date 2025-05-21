@@ -1,16 +1,18 @@
-use crate::parser::WrkMetrics;
+use std::collections::HashMap;
 use yew::prelude::*;
 
 #[derive(Properties, PartialEq)]
 pub struct ChartProps {
-    pub metrics: WrkMetrics,
+    pub stddev: f64,
+    pub avg: f64,
+    pub max: f64,
+    pub stddev_percent: f64,
+    pub distribution: HashMap<String, f64>,
 }
 
 #[function_component(LatencyChart)]
 pub fn latency_chart(props: &ChartProps) -> Html {
-    let metrics = &props.metrics;
-
-    let mut latency_distribution: Vec<_> = metrics.latency_distribution.iter().collect();
+    let mut latency_distribution: Vec<_> = props.distribution.iter().collect();
     latency_distribution.sort_by(|a, b| {
         parse_percent_float(a.0)
             .partial_cmp(&parse_percent_float(b.0))
@@ -21,14 +23,18 @@ pub fn latency_chart(props: &ChartProps) -> Html {
         <div class="metric-panel panel-latency-stats">
             <h3>{ "Latency" }</h3>
             <div class="metric-content">
-                <MetricRow label="Average" value={metrics.latency.avg} />
-                <MetricRow label="Standard Deviation" value={metrics.latency.stdev} />
-                <MetricRow label="Max" value={metrics.latency.max} />
+                <MetricRow label="Average" value={props.avg} />
+                <MetricRow label="Standard Deviation" value={props.stddev} />
+                <MetricRow label="Max" value={props.max} />
+                <div class="metric-row">
+                    <div class="metric-label">{ "Standard Deviation Percent" }</div>
+                    <div class="metric-value">{ format!("{:.2}%",props.stddev_percent) }</div>
+                </div>
             </div>
-            if !latency_distribution.is_empty() {
+            if !props.distribution.is_empty() {
                 <h4>{ "Latency Distribution" }</h4>
                 <div class="metric-content">
-                    { for latency_distribution.into_iter().map(|(key, value)| html! { <MetricRow label={key.clone()} value={*value} /> }) }
+                    { for props.distribution.iter().map(|(key, value)| html! { <MetricRow label={key.clone()} value={value} /> }) }
                 </div>
             }
         </div>

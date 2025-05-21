@@ -7,19 +7,19 @@ pub struct RequestSec {
     #[serde(default, skip_serializing_if = "is_empty::check_f64")]
     pub avg: f64,
     #[serde(default, skip_serializing_if = "is_empty::check_f64")]
-    pub stdev: f64,
+    pub stddev: f64,
     #[serde(default, skip_serializing_if = "is_empty::check_f64")]
     pub max: f64,
     #[serde(default, skip_serializing_if = "is_empty::check_f64")]
-    pub stdev_percent: f64,
+    pub stddev_percent: f64,
 }
 
 impl RequestSec {
     pub fn is_empty(&self) -> bool {
         is_empty::check_f64(&self.avg)
-            && is_empty::check_f64(&self.stdev)
+            && is_empty::check_f64(&self.stddev)
             && is_empty::check_f64(&self.max)
-            && is_empty::check_f64(&self.stdev_percent)
+            && is_empty::check_f64(&self.stddev_percent)
     }
 }
 
@@ -32,11 +32,11 @@ impl From<&str> for RequestSec {
             .take(4)
             .map(units::parse_count)
             .collect_tuple()
-            .map(|(avg, stdev, max, stdev_percent)| RequestSec {
+            .map(|(avg, stddev, max, stddev_percent)| RequestSec {
                 avg,
-                stdev,
+                stddev,
                 max,
-                stdev_percent,
+                stddev_percent,
             })
             .unwrap_or_default()
     }

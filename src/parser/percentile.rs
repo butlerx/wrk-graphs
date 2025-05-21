@@ -1,131 +1,26 @@
-use super::is_empty;
 use serde::{Deserialize, Serialize};
-
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize, Default)]
-pub struct PercentileSpectrum {
-    #[serde(default, skip_serializing_if = "is_empty::check_f64")]
-    pub mean: f64,
-    #[serde(default, skip_serializing_if = "is_empty::check_f64")]
-    pub std_deviation: f64,
-    #[serde(default, skip_serializing_if = "is_empty::check_f64")]
-    pub max: f64,
-    #[serde(default, skip_serializing_if = "is_empty::check_u64")]
-    pub total_count: u64,
-    #[serde(default, skip_serializing_if = "is_empty::check_u32")]
-    pub buckets: u32,
-    #[serde(default, skip_serializing_if = "is_empty::check_u32")]
-    pub sub_buckets: u32,
-    #[serde(default, skip_serializing_if = "Vec::is_empty")]
-    pub percentiles: Vec<PercentileBucket>,
-}
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct PercentileBucket {
     pub value: f64,
     pub percentile: f64,
-    pub total_count: u64,
-    pub inverse_percentile: f64,
 }
 
-impl PercentileSpectrum {
-    pub fn is_empty(&self) -> bool {
-        is_empty::check_f64(&self.mean)
-            && is_empty::check_f64(&self.std_deviation)
-            && is_empty::check_f64(&self.max)
-            && is_empty::check_u64(&self.total_count)
-            && is_empty::check_u32(&self.buckets)
-            && is_empty::check_u32(&self.sub_buckets)
-            && self.percentiles.is_empty()
-    }
-}
-
-impl From<&[&str]> for PercentileSpectrum {
-    fn from(lines: &[&str]) -> Self {
-        lines
-            .iter()
-            .position(|l| l.contains("Detailed Percentile spectrum"))
-            .map_or_else(PercentileSpectrum::default, |start_idx| {
-                let summary = lines
-                    .iter()
-                    .skip(start_idx)
-                    .take_while(|l| !l.starts_with("Latency"))
-                    .fold(PercentileSpectrum::default(), |acc, line| match line {
-                        l if l.starts_with("#[Mean") => {
-                            let parts: Vec<_> = line.split_whitespace().collect();
-                            let mean = match parts.get(2) {
-                                Some(v) => v.trim_end_matches(',').parse().unwrap_or(0.0),
-                                _ => 0.0,
-                            };
-                            let std_deviation = match parts.get(5) {
-                                Some(v) => v.trim_end_matches(']').parse().unwrap_or(0.0),
-                                _ => 0.0,
-                            };
-                            PercentileSpectrum {
-                                mean,
-                                std_deviation,
-                                ..acc
-                            }
-                        }
-                        l if l.starts_with("#[Max") => {
-                            let parts: Vec<_> = line.split_whitespace().collect();
-                            let max = match parts.get(2) {
-                                Some(v) => v.trim_end_matches(',').parse().unwrap_or(0.0),
-                                _ => 0.0,
-                            };
-                            let total_count = match parts.get(6) {
-                                Some(v) => v.trim_end_matches(']').parse().unwrap_or(0),
-                                _ => 0,
-                            };
-                            PercentileSpectrum {
-                                max,
-                                total_count,
-                                ..acc
-                            }
-                        }
-                        l if l.starts_with("#[Buckets") => {
-                            let parts: Vec<_> = line.split_whitespace().collect();
-                            let buckets = match parts.get(2) {
-                                Some(v) => v.trim_end_matches(',').parse().unwrap_or(0),
-                                _ => 0,
-                            };
-                            let sub_buckets = match parts.get(5) {
-                                Some(v) => v.trim_end_matches(']').parse().unwrap_or(0),
-                                _ => 0,
-                            };
-                            PercentileSpectrum {
-                                buckets,
-                                sub_buckets,
-                                ..acc
-                            }
-                        }
-
-                        _ => acc,
-                    });
-
-                let percentiles = lines
-                    .iter()
-                    .skip(start_idx + 2)
-                    .take_while(|l| !l.starts_with("#["))
-                    .filter_map(|line| {
-                        let parts: Vec<&str> = line.split_whitespace().collect();
-                        Some(PercentileBucket {
-                            value: parts.first()?.parse().ok()?,
-                            percentile: parts.get(1)?.parse().ok()?,
-                            total_count: parts.get(2)?.parse().ok()?,
-                            inverse_percentile: match parts.get(3) {
-                                Some(&"inf") => f64::INFINITY,
-                                Some(v) => v.parse().ok()?,
-                                None => 0.0,
-                            },
-                        })
-                    })
-                    .collect();
-
-                PercentileSpectrum {
-                    percentiles,
-                    ..summary
-                }
-            })
+impl TryFrom<&str> for PercentileBucket {
+    type Error = String;
+    fn try_from(line: &str) -> Result<Self, Self::Error> {
+        let parts: Vec<&str> = line.split_whitespace().collect();
+        let value = parts
+            .first()
+            .ok_or("Invalid line format")?
+            .parse::<f64>()
+            .map_err(|_| "Invalid value".to_string())?;
+        let percentile = parts
+            .get(1)
+            .ok_or("Invalid line format")?
+            .parse::<f64>()
+            .map_err(|_| "Invalid percentile".to_string())?;
+        Ok(Self { value, percentile })
     }
 }
 
@@ -165,19 +60,13 @@ Detailed Percentile spectrum:
         assert_float_eq(spectrum.std_deviation, 1.919);
         assert_float_eq(spectrum.max, 12.496);
         assert_eq!(spectrum.total_count, 39500);
-        assert_eq!(spectrum.buckets, 27);
-        assert_eq!(spectrum.sub_buckets, 2048);
 
         // Test first bucket
         assert_float_eq(spectrum.percentiles[0].value, 0.921);
         assert_float_eq(spectrum.percentiles[0].percentile, 0.0);
-        assert_eq!(spectrum.percentiles[0].total_count, 1);
-        assert_float_eq(spectrum.percentiles[0].inverse_percentile, 1.0);
 
         // Test middle bucket
         assert_float_eq(spectrum.percentiles[5].value, 6.671);
-        assert_float_eq(spectrum.percentiles[5].percentile, 0.5);
-        assert_eq!(spectrum.percentiles[5].total_count, 19783);
-        assert_eq!(spectrum.percentiles[5].inverse_percentile, f64::INFINITY);
+        assert_float_eq(spectrum.percentiles[5].percentile, 50.0);
     }
 }

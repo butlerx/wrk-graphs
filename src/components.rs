@@ -1,5 +1,6 @@
 mod latency_chart;
 mod latency_percentile_chart;
+mod line_chart;
 mod requests_per_sec_chart;
 mod share_modal;
 mod wrk_config;

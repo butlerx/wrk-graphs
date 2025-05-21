@@ -1,5 +1,5 @@
 use super::{
-    is_empty, latency::Latency, percentile::PercentileSpectrum, request_sec::RequestSec, units,
+    is_empty, latency::Latency, percentile::PercentileBucket, request_sec::RequestSec, units,
 };
 use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, str::FromStr};
@@ -26,8 +26,8 @@ pub struct WrkMetrics {
     pub transfer_per_sec: String,
     #[serde(default, skip_serializing_if = "HashMap::is_empty")]
     pub latency_distribution: HashMap<String, f64>,
-    #[serde(default, skip_serializing_if = "PercentileSpectrum::is_empty")]
-    pub percentile_spectrum: PercentileSpectrum,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub percentiles: Vec<PercentileBucket>,
 }
 
 impl WrkMetrics {
@@ -41,7 +41,7 @@ impl WrkMetrics {
             && is_empty::check_f64(&self.requests_per_sec)
             && self.transfer_per_sec.is_empty()
             && self.latency_distribution.is_empty()
-            && self.percentile_spectrum.is_empty()
+            && self.percentiles.is_empty()
     }
 }
 
@@ -78,7 +78,23 @@ impl From<&str> for WrkMetrics {
             .unwrap_or_default();
 
         let latency_distribution = parse_latency_distribution(&lines);
-        let percentile_spectrum = PercentileSpectrum::from(lines.as_slice());
+        let percentiles = lines
+            .iter()
+            .position(|l| l.contains("Detailed Percentile spectrum"))
+            .map_or_else(Vec::new, |start_idx| {
+                lines
+                    .iter()
+                    .skip(start_idx + 2)
+                    .take_while(|l| !l.starts_with("#["))
+                    .filter_map(|l| {
+                        if l.is_empty() {
+                            None
+                        } else {
+                            PercentileBucket::try_from(*l).ok()
+                        }
+                    })
+                    .collect()
+            });
 
         let req = lines
             .iter()
@@ -117,7 +133,7 @@ impl From<&str> for WrkMetrics {
             requests_per_sec,
             transfer_per_sec,
             latency_distribution,
-            percentile_spectrum,
+            percentiles,
         }
     }
 }
@@ -190,7 +206,7 @@ mod tests {
     const SAMPLE_OUTPUT: &str = r"
 Running 10s test @ http://localhost:8080
   2 threads and 100 connections
-  Thread Stats   Avg      Stdev     Max   +/- Stdev
+  Thread Stats   Avg      stddev     Max   +/- stddev
     Latency   125.12ms   25.31ms 450.00ms   90.12%
     Req/Sec   400.12     50.23   550.00     85.45%
   Latency Distribution
@@ -210,10 +226,10 @@ Transfer/sec:    656.56KB
         assert_eq!(metrics.threads, 2);
         assert_eq!(metrics.connections, 100);
         assert_float_eq(metrics.latency.avg, 125.12);
-        assert_float_eq(metrics.latency.stdev, 25.31);
+        assert_float_eq(metrics.latency.stddev, 25.31);
         assert_float_eq(metrics.latency.max, 450.0);
         assert_float_eq(metrics.req.avg, 400.12);
-        assert_float_eq(metrics.req.stdev, 50.23);
+        assert_float_eq(metrics.req.stddev, 50.23);
         assert_float_eq(metrics.req.max, 550.0);
         assert_eq!(metrics.total_requests, 8000);
         assert_float_eq(metrics.duration, 10.0);
@@ -231,7 +247,7 @@ Transfer/sec:    656.56KB
     const SAMPLE_OUTPUT_2: &str = r"
 Running 30s test @ http://localhost:8080/index.html
   12 threads and 400 connections
-  Thread Stats   Avg      Stdev     Max   +/- Stdev
+  Thread Stats   Avg      stddev     Max   +/- stddev
     Latency   635.91us    0.89ms  12.92ms   93.69%
     Req/Sec    56.20k     8.07k   62.00k    86.54%
 Latency Distribution
@@ -251,10 +267,10 @@ Transfer/sec:    606.33MB
         assert_eq!(metrics.threads, 12);
         assert_eq!(metrics.connections, 400);
         assert_float_eq(metrics.latency.avg, 0.63591);
-        assert_float_eq(metrics.latency.stdev, 0.89);
+        assert_float_eq(metrics.latency.stddev, 0.89);
         assert_float_eq(metrics.latency.max, 12.92);
         assert_float_eq(metrics.req.avg, 56200.0);
-        assert_float_eq(metrics.req.stdev, 8070.0);
+        assert_float_eq(metrics.req.stddev, 8070.0);
         assert_float_eq(metrics.req.max, 62000.0);
         assert_eq!(metrics.total_requests, 22_464_657);
         assert_float_eq(metrics.duration, 30.0);
@@ -273,7 +289,7 @@ Transfer/sec:    606.33MB
   2 threads and 100 connections
   Thread calibration: mean lat.: 1.473ms, rate sampling interval: 10ms
   Thread calibration: mean lat.: 1.496ms, rate sampling interval: 10ms
-  Thread Stats   Avg      Stdev     Max   +/- Stdev
+  Thread Stats   Avg      stddev     Max   +/- stddev
     Latency     1.46ms    2.24ms  44.06ms   98.51%
     Req/Sec     1.05k   265.56     5.40k    89.45%
   Latency Distribution (HdrHistogram - Recorded Latency)
@@ -390,10 +406,10 @@ Transfer/sec:    376.32KB";
         assert_eq!(metrics.threads, 2);
         assert_eq!(metrics.connections, 100);
         assert_float_eq(metrics.latency.avg, 1.46);
-        assert_float_eq(metrics.latency.stdev, 2.24);
+        assert_float_eq(metrics.latency.stddev, 2.24);
         assert_float_eq(metrics.latency.max, 44.06);
         assert_float_eq(metrics.req.avg, 1050.0);
-        assert_float_eq(metrics.req.stdev, 265.56);
+        assert_float_eq(metrics.req.stddev, 265.56);
         assert_float_eq(metrics.req.max, 5400.0);
         assert_eq!(metrics.total_requests, 119_802);
         assert_float_eq(metrics.duration, 60.0);
@@ -417,7 +433,7 @@ Transfer/sec:    376.32KB";
   2 threads and 100 connections
   Thread calibration: mean lat.: 10087 usec, rate sampling interval: 22 msec
   Thread calibration: mean lat.: 10139 usec, rate sampling interval: 21 msec
-  Thread Stats   Avg      Stdev     Max   +/- Stdev
+  Thread Stats   Avg      stddev     Max   +/- stddev
     Latency     6.60ms    1.92ms  12.50ms   68.46%
     Req/Sec     1.04k     1.08k    2.50k    72.79%
   Latency Distribution (HdrHistogram - Recorded Latency)
@@ -528,10 +544,10 @@ Transfer/sec:    676.18KB
         assert_eq!(metrics.threads, 2);
         assert_eq!(metrics.connections, 100);
         assert_float_eq(metrics.latency.avg, 6.60);
-        assert_float_eq(metrics.latency.stdev, 1.92);
+        assert_float_eq(metrics.latency.stddev, 1.92);
         assert_float_eq(metrics.latency.max, 12.50);
         assert_float_eq(metrics.req.avg, 1040.0);
-        assert_float_eq(metrics.req.stdev, 1080.0);
+        assert_float_eq(metrics.req.stddev, 1080.0);
         assert_float_eq(metrics.req.max, 2500.0);
         assert_eq!(metrics.total_requests, 60018);
         assert_float_eq(metrics.duration, 30.0);
@@ -557,10 +573,10 @@ Transfer/sec:    676.18KB
         assert_eq!(empty.threads, 0);
         assert_eq!(empty.connections, 0);
         assert_float_eq(empty.latency.avg, 0.0);
-        assert_float_eq(empty.latency.stdev, 0.0);
+        assert_float_eq(empty.latency.stddev, 0.0);
         assert_float_eq(empty.latency.max, 0.0);
         assert_float_eq(empty.req.avg, 0.0);
-        assert_float_eq(empty.req.stdev, 0.0);
+        assert_float_eq(empty.req.stddev, 0.0);
         assert_float_eq(empty.req.max, 0.0);
         assert_eq!(empty.total_requests, 0);
         assert_float_eq(empty.duration, 0.0);

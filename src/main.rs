@@ -24,11 +24,13 @@ pub fn app() -> Html {
     html! {
         <BrowserRouter>
             <main>
-                <Switch<Route> render={|routes| match routes {
-                    Route::Home => html! { <HomePage /> },
-                    Route::Dashboard => html! { <DashboardPage /> },
-                    Route::NotFound => html! { <NotFoundPage /> },
-                }} />
+                <Switch<Route>
+                    render={|routes| match routes {
+                        Route::Home => html! { <HomePage /> },
+                        Route::Dashboard => html! { <DashboardPage /> },
+                        Route::NotFound => html! { <NotFoundPage /> },
+                    }}
+                />
             </main>
         </BrowserRouter>
     }

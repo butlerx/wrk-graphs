@@ -173,10 +173,24 @@ pub fn dashboard_page() -> Html {
                                 <div class="metric-label">{ "Connections" }</div>
                             </div>
                         </div>
-                        <RequestsPerSecChart metrics={metrics.clone()} />
-                        <LatencyChart metrics={metrics.clone()} />
-                        if !metrics.percentile_spectrum.percentiles.is_empty() {
-                            <LatencyPercentileChart metrics={metrics.clone()} />
+                        <RequestsPerSecChart
+                            avg={metrics.req.avg}
+                            stddev={metrics.req.stddev}
+                            max={metrics.req.max}
+                            stddev_percent={metrics.req.stddev_percent}
+                        />
+                        <LatencyChart
+                            avg={metrics.latency.avg}
+                            stddev={metrics.latency.stddev}
+                            max={metrics.latency.max}
+                            stddev_percent={metrics.latency.stddev_percent}
+                            distribution={metrics.latency_distribution.clone()}
+                        />
+                        if !metrics.percentiles.is_empty() {
+                            <LatencyPercentileChart
+                                requests_per_sec={metrics.requests_per_sec}
+                                percentiles={metrics.percentiles.clone()}
+                            />
                         }
                     </div>
                 </div>
@@ -184,7 +198,7 @@ pub fn dashboard_page() -> Html {
         }
         Err(e) => {
             log::error!("Failed to decode dashboard data: {}", e);
-            html! { <Redirect<Route> to={Route::Home}/>}
+            html! { <Redirect<Route> to={Route::Home} /> }
         }
     }
 }
