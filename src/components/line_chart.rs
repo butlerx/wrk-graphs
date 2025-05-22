@@ -1,3 +1,5 @@
+#![allow(clippy::cast_possible_truncation)]
+#![allow(clippy::cast_sign_loss)]
 use gloo::events::EventListener;
 use web_sys::{wasm_bindgen::JsCast, window, CanvasRenderingContext2d, HtmlCanvasElement};
 use yew::prelude::*;

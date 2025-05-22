@@ -53,20 +53,17 @@ Detailed Percentile spectrum:
 
     #[test]
     fn test_parse_percentile_spectrum() {
-        let lines: Vec<&str> = SAMPLE_SPECTRUM.lines().collect();
-        let spectrum = PercentileSpectrum::from(lines.as_slice());
-
-        assert_float_eq(spectrum.mean, 6.602);
-        assert_float_eq(spectrum.std_deviation, 1.919);
-        assert_float_eq(spectrum.max, 12.496);
-        assert_eq!(spectrum.total_count, 39500);
+        let percentiles = SAMPLE_SPECTRUM
+            .lines()
+            .filter_map(|l| PercentileBucket::try_from(l).ok())
+            .collect::<Vec<PercentileBucket>>();
 
         // Test first bucket
-        assert_float_eq(spectrum.percentiles[0].value, 0.921);
-        assert_float_eq(spectrum.percentiles[0].percentile, 0.0);
+        assert_float_eq(percentiles[0].value, 0.921);
+        assert_float_eq(percentiles[0].percentile, 0.0);
 
         // Test middle bucket
-        assert_float_eq(spectrum.percentiles[5].value, 6.671);
-        assert_float_eq(spectrum.percentiles[5].percentile, 50.0);
+        assert_float_eq(percentiles[5].value, 6.671);
+        assert_float_eq(percentiles[5].percentile, 0.5);
     }
 }

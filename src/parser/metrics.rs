@@ -583,6 +583,6 @@ Transfer/sec:    676.18KB
         assert_float_eq(empty.requests_per_sec, 0.0);
         assert_eq!(empty.transfer_per_sec, "");
         assert!(empty.latency_distribution.is_empty());
-        assert_eq!(empty.percentile_spectrum.percentiles.len(), 0);
+        assert_eq!(empty.percentiles.len(), 0);
     }
 }
