@@ -303,7 +303,7 @@ fn draw_x_axis_labels(
     context.set_text_baseline("middle");
     let x_labels = props.x.clone().into_iter();
     for (i, x_label) in x_labels.enumerate() {
-        let x = axis_padding + (i as f64 * 10.0) * point_spacing;
+        let x = axis_padding + (f64::from(i as u32) * 10.0) * point_spacing;
         let y = height - axis_padding / 2.0;
         context.fill_text(x_label.as_str(), x, y).unwrap();
     }

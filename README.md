@@ -14,25 +14,22 @@ This application allows you to:
 
 ## Prerequisites
 
-If you don't already have it installed, it's time to install Rust:
-<https://www.rust-lang.org/tools/install>. The rest of this guide assumes a
-typical Rust installation which contains both `rustup` and Cargo.
-
-To compile Rust to WASM, we need to have the `wasm32-unknown-unknown` target
-installed and trunk. If you don't already them, install them with the following
-command:
+Install [mise](https://mise.jdx.dev/getting-started.html), then from the
+project root:
 
 ```bash
-rustup target add wasm32-unknown-unknown
-cargo install trunk wasm-bindgen-cli
+mise install
 ```
+
+This installs Rust (with rust-analyzer and the wasm32-unknown-unknown target),
+Trunk, wasm-bindgen-cli, tombi, and zizmor at the correct versions.
 
 ## Development
 
-To run the development server:
+Start the development server:
 
 ```bash
-trunk serve
+mise run dev
 ```
 
 This will rebuild the app whenever a change is detected and run a local server
@@ -40,16 +37,26 @@ to host it.
 
 ## Building for Production
 
-To create a production build:
-
 ```bash
-trunk build --release
+mise run build
 ```
 
-This builds the app in release mode. You can also pass the `--release` flag to
-`trunk serve` if you need to get every last drop of performance.
+Output will be in the `dist` directory.
 
-Unless overwritten, the output will be located in the `dist` directory.
+## Available Tasks
+
+| Command                  | Description                        |
+| ------------------------ | ---------------------------------- |
+| `mise run dev`           | Start dev server with hot-reload   |
+| `mise run build`         | Build for production               |
+| `mise run test`          | Run tests                          |
+| `mise run lint`          | Run clippy                         |
+| `mise run lint:fix`      | Auto-fix lint issues               |
+| `mise run format`        | Format code (Rust + TOML)          |
+| `mise run format:check`  | Check formatting                   |
+| `mise run check`         | Run all CI checks                  |
+| `mise run check:actions` | Lint GitHub Actions workflows      |
+| `mise run clean`         | Clean build artifacts              |
 
 ## License
 

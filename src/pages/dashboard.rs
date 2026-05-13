@@ -55,7 +55,7 @@ pub fn dashboard_page() -> Html {
                             <>
                                 <MetricPanel class="panel-requests-per-sec" value={ format_requests_float(test.requests_per_sec) } label="Requests per second" />
                                 <MetricPanel class="panel-total-requests" value={ format_requests(test.total_requests) } label="Total requests" />
-                                <MetricPanel class="panel-data-transferred" value={ test.transfer_per_sec.to_string() } label="Data transfered" />
+                                <MetricPanel class="panel-data-transferred" value={ test.transfer_per_sec.clone() } label="Data transferred" />
                                 <MetricPanel class="panel-threads" value={ test.threads.to_string() } label="Threads" />
                                 <MetricPanel class="panel-connections" value={ test.connections.to_string() } label="Connections" />
                                 <RequestsPerSecChart avg={test.req.avg} stddev={test.req.stddev} max={test.req.max} stddev_percent={test.req.stddev_percent} />

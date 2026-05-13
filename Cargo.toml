@@ -1,30 +1,30 @@
 [package]
-name = "wrk_graphs"
-version = "0.1.0"
-edition = "2021"
+name        = "wrk_graphs"
+version     = "0.1.0"
+edition     = "2021"
 description = "A web application for visualizing and sharing load testing results."
-readme = "README.md"
-repository = "https://github.com/butlerx/wrk-graphs"
-license = "Apache-2.0"
-authors = ["Cian Butler <butlerx@notthe.cloud>"]
-keywords = ["wrk", "loadtest", "yew", "rust", "web", "wasm"]
-categories = ["wasm", "web", "loadtest", "graphs"]
+readme      = "README.md"
+repository  = "https://github.com/butlerx/wrk-graphs"
+license     = "Apache-2.0"
+authors     = ["Cian Butler <butlerx@notthe.cloud>"]
+keywords    = ["loadtest", "rust", "wasm", "web", "wrk", "yew"]
+categories  = ["graphs", "loadtest", "wasm", "web"]
 
 [dependencies]
-base64 = "0.22"
-flate2 = "1"
-gloo = "0.11"
-gloo-file = "0.3"
-itertools = "0.14"
-js-sys = "0.3"
-log = "0.4"
-rmp-serde = "1.3"
-serde = { version = "1", features = ["derive"] }
-thiserror = "2"
-wasm-bindgen = "0.2"
+base64               = "0.22"
+flate2               = "1"
+gloo                 = "0.11"
+gloo-file            = "0.3"
+itertools            = "0.14"
+js-sys               = "0.3"
+log                  = "0.4"
+rmp-serde            = "1.3"
+serde                = { version = "1", features = ["derive"] }
+thiserror            = "2"
+wasm-bindgen         = "0.2"
 wasm-bindgen-futures = "0.4"
-wasm-logger = "0.2"
-web-sys = { version = "0.3", features = [
+wasm-logger          = "0.2"
+web-sys              = { version = "0.3", features = [
   "CanvasRenderingContext2d",
   "Clipboard",
   "Document",
@@ -39,5 +39,5 @@ web-sys = { version = "0.3", features = [
   "Navigator",
   "Window",
 ] }
-yew = { version = "0.21", features = ["csr"] }
-yew-router = "0.18"
+yew                  = { version = "0.21", features = ["csr"] }
+yew-router           = "0.18"

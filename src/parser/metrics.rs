@@ -30,21 +30,6 @@ pub struct WrkMetrics {
     pub percentiles: Vec<PercentileBucket>,
 }
 
-impl WrkMetrics {
-    pub fn is_empty(&self) -> bool {
-        is_empty::check_u64(&self.threads)
-            && is_empty::check_u64(&self.connections)
-            && self.latency.is_empty()
-            && self.req.is_empty()
-            && is_empty::check_u64(&self.total_requests)
-            && is_empty::check_f64(&self.duration)
-            && is_empty::check_f64(&self.requests_per_sec)
-            && self.transfer_per_sec.is_empty()
-            && self.latency_distribution.is_empty()
-            && self.percentiles.is_empty()
-    }
-}
-
 impl From<&str> for WrkMetrics {
     fn from(output: &str) -> Self {
         let lines = output
