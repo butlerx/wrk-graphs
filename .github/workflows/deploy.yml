@@ -29,7 +29,7 @@ jobs:
         with:
           install_args: --verbose
       - name: Build Yew site with Trunk
-        run: trunk build --public-url /${GITHUB_EVENT_REPOSITORY_NAME}
+        run: mise build ${GITHUB_EVENT_REPOSITORY_NAME}
         env:
           GITHUB_EVENT_REPOSITORY_NAME: ${{ github.event.repository.name }}
       - name: Upload Pages artifact

@@ -18,8 +18,8 @@ alias       = "d"
 
 [tasks.build]
 description = "Build for production"
-usage       = 'arg "[args]" var=#true help="Additional arguments passed to trunk build"'
-run         = "trunk build --release ${usage_args:-}"
+usage       = 'arg "<public_url>" var=#true help="Public URL for the built assets (e.g., my-app)"'
+run         = "trunk build --public-url /${usage_public_url}"
 alias       = "b"
 sources     = [
   "Cargo.lock",
