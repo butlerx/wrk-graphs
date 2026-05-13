@@ -1,6 +1,7 @@
 use crate::{
     components::{
-        DashboardHeader, LatencyChart, LatencyPercentileChart, MetricPanel, RequestsPerSecChart,
+        CriterionBenchmark, CriterionGroupChart, DashboardHeader, LatencyChart,
+        LatencyPercentileChart, MetricPanel, RequestsPerSecChart,
     },
     serialzer::decode_dashboard,
     Route,
@@ -32,14 +33,20 @@ pub fn dashboard_page() -> Html {
 
     match decode_dashboard(hash) {
         Ok(data) => {
-            if data.tests.is_empty() {
+            if data.tests.is_empty() && data.benchmarks.is_empty() {
                 return html! { <Redirect<Route> to={Route::Home} /> };
             }
-            let endpoint = if data.tests[0].endpoint.is_empty() {
-                None
-            } else {
-                Some(data.tests[0].endpoint.clone())
-            };
+
+            let endpoint = data.tests.first().and_then(|t| {
+                if t.endpoint.is_empty() {
+                    None
+                } else {
+                    Some(t.endpoint.clone())
+                }
+            });
+
+            let num_tests = data.tests.len();
+            let num_benchmarks = data.benchmarks.len();
 
             html! {
                 <div class="dashboard">
@@ -48,24 +55,44 @@ pub fn dashboard_page() -> Html {
                         hash={hash_string}
                         endpoint={endpoint}
                         tags={data.tags}
-                        runs={data.tests.len()}
+                        tests={num_tests}
+                        benchmarks={num_benchmarks}
                     />
-                    <div class="dashboard-grid">
-                        { for data.tests.iter().map(|test| html! {
-                            <>
-                                <MetricPanel class="panel-requests-per-sec" value={ format_requests_float(test.requests_per_sec) } label="Requests per second" />
-                                <MetricPanel class="panel-total-requests" value={ format_requests(test.total_requests) } label="Total requests" />
-                                <MetricPanel class="panel-data-transferred" value={ test.transfer_per_sec.clone() } label="Data transferred" />
-                                <MetricPanel class="panel-threads" value={ test.threads.to_string() } label="Threads" />
-                                <MetricPanel class="panel-connections" value={ test.connections.to_string() } label="Connections" />
-                                <RequestsPerSecChart avg={test.req.avg} stddev={test.req.stddev} max={test.req.max} stddev_percent={test.req.stddev_percent} />
-                                <LatencyChart avg={test.latency.avg} stddev={test.latency.stddev} max={test.latency.max} stddev_percent={test.latency.stddev_percent} distribution={test.latency_distribution.clone()} />
-                                if !test.percentiles.is_empty() {
-                                    <LatencyPercentileChart requests_per_sec={test.requests_per_sec} percentiles={test.percentiles.clone()} />
-                                }
-                            </>
-                        }) }
-                    </div>
+                    if !data.tests.is_empty() {
+                        <div class="dashboard-grid">
+                            { for data.tests.iter().map(|test| html! {
+                                <>
+                                    <MetricPanel class="panel-requests-per-sec" value={ format_requests_float(test.requests_per_sec) } label="Requests per second" />
+                                    <MetricPanel class="panel-total-requests" value={ format_requests(test.total_requests) } label="Total requests" />
+                                    <MetricPanel class="panel-data-transferred" value={ test.transfer_per_sec.clone() } label="Data transferred" />
+                                    <MetricPanel class="panel-threads" value={ test.threads.to_string() } label="Threads" />
+                                    <MetricPanel class="panel-connections" value={ test.connections.to_string() } label="Connections" />
+                                    <RequestsPerSecChart avg={test.req.avg} stddev={test.req.stddev} max={test.req.max} stddev_percent={test.req.stddev_percent} />
+                                    <LatencyChart avg={test.latency.avg} stddev={test.latency.stddev} max={test.latency.max} stddev_percent={test.latency.stddev_percent} distribution={test.latency_distribution.clone()} />
+                                    if !test.percentiles.is_empty() {
+                                        <LatencyPercentileChart requests_per_sec={test.requests_per_sec} percentiles={test.percentiles.clone()} />
+                                    }
+                                </>
+                            }) }
+                        </div>
+                    }
+                    if !data.benchmarks.is_empty() {
+                        <div class="criterion-section">
+                            <CriterionGroupChart benchmarks={data.benchmarks.clone()} />
+                            { for data.benchmarks.iter().map(|bench| html! {
+                                <CriterionBenchmark metrics={bench.clone()} />
+                            }) }
+                        </div>
+                    }
+                    if !data.benchmarks.is_empty() {
+                        <div class="criterion-footer">
+                            <a href="https://bheisler.github.io/criterion.rs/book/user_guide/plots_and_graphs.html"
+                               target="_blank"
+                               rel="noopener noreferrer">
+                                { "Understanding Criterion.rs charts →" }
+                            </a>
+                        </div>
+                    }
                 </div>
             }
         }

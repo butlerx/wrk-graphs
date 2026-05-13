@@ -1,0 +1,23 @@
+mod benchmark;
+mod comparison;
+mod group_chart;
+mod iteration_times_chart;
+mod line_chart;
+mod pdf_chart;
+mod pdf_comparison_chart;
+mod regression_chart;
+mod regression_comparison_chart;
+mod stat_distribution_chart;
+mod stats_table;
+
+pub use benchmark::CriterionBenchmark;
+pub use comparison::CriterionComparison;
+pub use group_chart::CriterionGroupChart;
+pub use iteration_times_chart::CriterionIterationTimesChart;
+pub use line_chart::CriterionLineChart;
+pub use pdf_chart::CriterionPdfChart;
+pub use pdf_comparison_chart::CriterionPdfComparisonChart;
+pub use regression_chart::CriterionRegressionChart;
+pub use regression_comparison_chart::CriterionRegressionComparisonChart;
+pub use stat_distribution_chart::CriterionStatDistributionChart;
+pub use stats_table::CriterionStatsTable;

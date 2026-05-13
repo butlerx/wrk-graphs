@@ -1,0 +1,303 @@
+// Container for all criterion benchmarks — sits outside the wrk dashboard-grid
+.criterion-section {
+  margin-top: var(--spacing-xl);
+  padding-top: var(--spacing-lg);
+  border-top: 2px solid var(--main-base-02);
+}
+
+.criterion-benchmark {
+  margin-bottom: var(--spacing-xl);
+  padding: var(--spacing-lg);
+  background: var(--main-base-01);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--main-base-02);
+
+  .benchmark-name {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--main-base-06);
+    margin: 0 0 var(--spacing-lg) 0;
+    padding-bottom: var(--spacing-sm);
+    border-bottom: 2px solid var(--main-base-02);
+  }
+
+  .benchmark-metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .benchmark-stats {
+    margin-bottom: var(--spacing-lg);
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--main-base-02);
+    border-radius: var(--radius-sm);
+    padding: var(--spacing-lg);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  }
+
+  .benchmark-charts {
+    margin-bottom: var(--spacing-lg);
+    padding-top: var(--spacing-lg);
+    border-top: 1px solid var(--main-base-02);
+  }
+
+  .chart-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-lg);
+
+    @media (max-width: 900px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .chart-panel {
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--main-base-02);
+    border-radius: var(--radius-sm);
+    padding: var(--spacing-lg);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+
+    .chart-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--color-text-on-light);
+      margin: 0 0 var(--spacing-sm) 0;
+    }
+
+    .chart-description {
+      font-size: 0.8rem;
+      color: var(--color-text-secondary-on-light);
+      margin: var(--spacing-xs) 0 0 0;
+      line-height: 1.4;
+    }
+
+    canvas {
+      width: 100%;
+      display: block;
+      border-radius: 4px;
+    }
+  }
+
+  .confidence-interval {
+    font-size: 0.9rem;
+    color: var(--color-text-secondary-on-light);
+    font-family: var(--main-fonts);
+    margin-top: var(--spacing-xs);
+  }
+
+  .panel-change {
+    &.change-improved .main-value {
+      color: var(--main-base-0b);
+    }
+
+    &.change-regressed .main-value {
+      color: var(--main-base-08);
+    }
+
+    &.change-none .main-value {
+      color: var(--color-text-secondary-on-light);
+    }
+  }
+
+  .panel-outliers {
+    .metric-row {
+      display: flex;
+      justify-content: space-between;
+      padding: var(--spacing-xs) 0;
+    }
+  }
+}
+
+.criterion-stats-table {
+  .criterion-confidence {
+    font-size: 0.85rem;
+    color: var(--color-text-secondary-on-light);
+    margin-bottom: var(--spacing-sm);
+    font-style: italic;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--main-fonts);
+    font-size: 0.9rem;
+  }
+
+  thead th {
+    text-align: left;
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-bottom: 2px solid var(--color-border);
+    color: var(--color-text-secondary-on-light);
+    font-weight: 600;
+  }
+
+  tbody td {
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-bottom: 1px solid var(--color-border);
+    color: var(--color-text-on-light);
+  }
+
+  tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  td:first-child {
+    font-weight: 600;
+  }
+
+  td:nth-child(3) {
+    font-weight: 700;
+  }
+}
+
+.criterion-group-chart {
+  margin-bottom: var(--spacing-xl);
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--main-base-02);
+  border-radius: var(--radius-sm);
+  padding: var(--spacing-lg);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+
+  .chart-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-text-on-light);
+    margin: 0 0 var(--spacing-sm) 0;
+  }
+
+  .chart-description {
+    font-size: 0.8rem;
+    color: var(--color-text-secondary-on-light);
+    margin: var(--spacing-xs) 0 0 0;
+    line-height: 1.4;
+  }
+
+  canvas {
+    width: 100%;
+    display: block;
+    border-radius: 4px;
+  }
+}
+
+.stat-distributions {
+  margin-top: var(--spacing-lg);
+
+  .stat-distributions-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--main-base-05);
+    margin: 0 0 var(--spacing-xs) 0;
+  }
+
+  .stat-distributions-description {
+    font-size: 0.85rem;
+    color: var(--main-base-04);
+    margin: 0 0 var(--spacing-md) 0;
+    line-height: 1.4;
+  }
+
+  .stat-distributions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+    gap: var(--spacing-lg);
+  }
+
+  .stat-distribution-panel {
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--main-base-02);
+    border-radius: var(--radius-sm);
+    padding: var(--spacing-md);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+
+    canvas {
+      width: 100%;
+      display: block;
+      border-radius: 4px;
+    }
+  }
+}
+
+.comparison-section {
+  margin-top: var(--spacing-lg);
+  padding-top: var(--spacing-lg);
+  border-top: 1px solid var(--main-base-02);
+
+  .comparison-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--main-base-06);
+    margin: 0 0 var(--spacing-lg) 0;
+  }
+
+  .comparison-charts {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-lg);
+
+    @media (max-width: 900px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .comparison-chart-panel {
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--main-base-02);
+    border-radius: var(--radius-sm);
+    padding: var(--spacing-lg);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+
+    canvas {
+      width: 100%;
+      display: block;
+      border-radius: 4px;
+    }
+  }
+
+  .change-distributions {
+    margin-top: var(--spacing-lg);
+
+    .change-distributions-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--main-base-05);
+      margin: 0 0 var(--spacing-xs) 0;
+    }
+
+    .change-distributions-description {
+      font-size: 0.85rem;
+      color: var(--main-base-04);
+      margin: 0 0 var(--spacing-md) 0;
+      line-height: 1.4;
+    }
+
+    .change-distributions-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+      gap: var(--spacing-lg);
+    }
+  }
+}
+
+.criterion-footer {
+  text-align: center;
+  padding: var(--spacing-lg) 0;
+  margin-top: var(--spacing-lg);
+  border-top: 1px solid var(--main-base-02);
+
+  a {
+    color: var(--color-accent);
+    text-decoration: none;
+    font-size: 0.9rem;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}

@@ -1376,6 +1376,7 @@ dependencies = [
  "log",
  "rmp-serde",
  "serde",
+ "serde_json",
  "thiserror 2.0.12",
  "wasm-bindgen",
  "wasm-bindgen-futures",

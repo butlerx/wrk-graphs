@@ -8,7 +8,8 @@ pub struct HeaderProps {
     pub description: Option<String>,
     pub endpoint: Option<String>,
     pub tags: Vec<String>,
-    pub runs: usize,
+    pub tests: usize,
+    pub benchmarks: usize,
 }
 
 #[function_component(DashboardHeader)]
@@ -18,7 +19,8 @@ pub fn dashboard_header(props: &HeaderProps) -> Html {
         description,
         endpoint,
         tags,
-        runs,
+        tests,
+        benchmarks,
     } = props;
 
     let navigator = use_navigator().unwrap();
@@ -41,7 +43,7 @@ pub fn dashboard_header(props: &HeaderProps) -> Html {
             <div class="header-content">
                 <div class="header-left" onclick={on_header_click}>
                     <img src="./icon.png" alt="Logo" class="header-icon" />
-                    <h1>{ "Load Test Results" }</h1>
+                    <h1>{ "Benchmark Results" }</h1>
                 </div>
                 <div class="share-buttons">
                     <CopyButton content={url.clone()} label="Copy URL" />
@@ -69,10 +71,18 @@ pub fn dashboard_header(props: &HeaderProps) -> Html {
                         </div>
                     </div>
                 }
-                <div class="metadata-row">
-                    <span class="metadata-label">{ "Number of Runs:" }</span>
-                    <span class="metadata-value">{ runs }</span>
-                </div>
+                if *tests > 0 {
+                    <div class="metadata-row">
+                        <span class="metadata-label">{ "Load Tests:" }</span>
+                        <span class="metadata-value">{ tests }</span>
+                    </div>
+                }
+                if *benchmarks > 0 {
+                    <div class="metadata-row">
+                        <span class="metadata-label">{ "Benchmarks:" }</span>
+                        <span class="metadata-value">{ benchmarks }</span>
+                    </div>
+                }
             </div>
         </header>
     }

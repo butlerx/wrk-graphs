@@ -1,16 +1,32 @@
 # Wrk Graphs
 
-A web application for sharing and visualizing wrk loadtest results. Built with
-Yew and Rust.
+A web application for sharing and visualizing wrk loadtest and Criterion.rs
+benchmark results. Built with Yew and Rust.
 
 ## Overview
 
 This application allows you to:
 
 - Share wrk loadtest results
+- Share Criterion.rs benchmark results
 - Visualize performance metrics
 - Compare different test runs
 - Collaborate on performance testing
+
+## Supported Formats
+
+### wrk
+
+Paste the output from a `wrk` or `wrk2` loadtest run.
+
+### Criterion.rs
+
+Three input formats are supported:
+
+- **CLI output** — paste the terminal output from `cargo bench`
+- **JSON messages** — output from `cargo-criterion --message-format=json`
+- **sample.json** — raw sample data from
+  `target/criterion/<benchmark>/new/sample.json`
 
 ## Prerequisites
 

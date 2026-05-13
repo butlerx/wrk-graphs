@@ -136,7 +136,7 @@ impl Component for ShareModal {
                     <div class="modal-body">
                         <div class="form-group">
                             <label for="test-data">
-                                { "Paste WRK test results or upload a file:" }
+                                { "Paste benchmark results (wrk, Criterion.rs) or upload a file:" }
                             </label>
                             <textarea
                                 id="test-data"

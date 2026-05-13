@@ -19,6 +19,8 @@ pub enum Error {
 pub struct Loadtest {
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub tests: Vec<parser::WrkMetrics>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub benchmarks: Vec<parser::CriterionMetrics>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
@@ -35,17 +37,29 @@ pub fn decode_dashboard(hash: &str) -> Result<Loadtest, Error> {
 }
 
 pub fn encode_dashboard(data: &str, desc: String, tags: Vec<String>) -> String {
-    let tests = parser::parse_tests(data);
+    let results = parser::parse_input(data);
+
+    let mut tests = Vec::new();
+    let mut benchmarks = Vec::new();
+
+    for result in results {
+        match result {
+            parser::BenchmarkResult::Wrk(m) => tests.push(*m),
+            parser::BenchmarkResult::Criterion(m) => benchmarks.push(*m),
+        }
+    }
+
     let description = if desc.is_empty() { None } else { Some(desc) };
     let data_obj = Loadtest {
         tests,
+        benchmarks,
         description,
         tags,
     };
 
     let mut buf = Vec::new();
     data_obj
-        .serialize(&mut rmp_serde::Serializer::new(&mut buf))
+        .serialize(&mut rmp_serde::Serializer::new(&mut buf).with_struct_map())
         .unwrap();
 
     let mut encoder = ZlibEncoder::new(&buf[..], flate2::Compression::best());
@@ -81,8 +95,27 @@ Transfer/sec:    656.56KB
         let hash = encode_dashboard(SAMPLE_INPUT, description.clone(), tags.clone());
         let decoded = decode_dashboard(&hash).unwrap();
         assert_eq!(decoded.tests[0].endpoint, "http://localhost:8080");
+        assert!(decoded.benchmarks.is_empty());
         assert_eq!(decoded.description, Some(description));
         assert_eq!(decoded.tags, tags);
+    }
+
+    #[test]
+    fn test_encode_decode_criterion() {
+        let criterion_input = r"
+Benchmarking fib/20
+fib/20                  time:   [1.9245 ms 1.9298 ms 1.9359 ms]
+                        change: [-0.5765% +0.2437% +1.1291%] (p = 0.59 > 0.05)
+                        No change in performance detected.
+Found 3 outliers among 100 measurements (3.00%)
+  2 (2.00%) high mild
+  1 (1.00%) high severe
+";
+        let hash = encode_dashboard(criterion_input, String::new(), vec![]);
+        let decoded = decode_dashboard(&hash).unwrap();
+        assert!(decoded.tests.is_empty());
+        assert_eq!(decoded.benchmarks.len(), 1);
+        assert_eq!(decoded.benchmarks[0].name, "fib/20");
     }
 
     #[test]

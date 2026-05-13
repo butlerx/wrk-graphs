@@ -1,4 +1,6 @@
-use super::line_chart::{LineCurveChart, LineCurveChartConfig, LineCurveChartProps, Series};
+use crate::components::charts::{
+    LineCurveChart, LineCurveChartConfig, LineCurveChartProps, Series,
+};
 use crate::parser::PercentileBucket;
 use yew::prelude::*;
 
