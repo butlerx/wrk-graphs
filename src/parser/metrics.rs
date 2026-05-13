@@ -191,6 +191,27 @@ fn parse_requests_line(line: &str) -> Option<(u64, f64)> {
     Some((requests, duration))
 }
 
+pub fn parse_tests(output: &str) -> Vec<WrkMetrics> {
+    let mut tests = Vec::new();
+    let mut current_test = String::new();
+
+    for line in output.lines() {
+        if line.trim().starts_with("Running") && !current_test.trim().is_empty() {
+            tests.push(WrkMetrics::from(current_test.as_str()));
+            current_test.clear();
+        }
+        current_test.push_str(line);
+        current_test.push('\n');
+    }
+
+    // Parse the last test
+    if current_test.trim().starts_with("Running") && !current_test.trim().is_empty() {
+        tests.push(WrkMetrics::from(current_test.as_str()));
+    }
+
+    tests
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -584,5 +605,85 @@ Transfer/sec:    676.18KB
         assert_eq!(empty.transfer_per_sec, "");
         assert!(empty.latency_distribution.is_empty());
         assert_eq!(empty.percentiles.len(), 0);
+    }
+
+    #[test]
+    fn test_parse_multiple_tests() {
+        let input = r"
+Running 5s test @ http://google.fr
+  2 threads and 10 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency    30.56ms   12.92ms 140.67ms   94.64%
+    Req/Sec       -nan      -nan   0.00      0.00%
+  Latency Distribution (HdrHistogram - Recorded Latency)
+ 50.000%   27.55ms
+ 75.000%   28.43ms
+ 90.000%   32.83ms
+ 99.000%  109.50ms
+ 99.900%  133.50ms
+ 99.990%  140.80ms
+ 99.999%  140.80ms
+100.000%  140.80ms
+  1495 requests in 5.00s, 785.46KB read
+Requests/sec:    1
+Transfer/sec:    156.95KB
+Running 5s test @ http://google.fr
+  2 threads and 10 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency    30.56ms   12.92ms 140.67ms   94.64%
+    Req/Sec       -nan      -nan   0.00      0.00%
+  Latency Distribution (HdrHistogram - Recorded Latency)
+ 50.000%   27.55ms
+ 75.000%   28.43ms
+ 90.000%   32.83ms
+ 99.000%  109.50ms
+ 99.900%  133.50ms
+ 99.990%  140.80ms
+ 99.999%  140.80ms
+100.000%  140.80ms
+  1495 requests in 5.00s, 785.46KB read
+Requests/sec:    2
+Transfer/sec:    156.95KB";
+
+        let collection = parse_tests(input);
+        assert_eq!(collection.len(), 2);
+
+        // Test first result
+        let first = &collection[0];
+        assert_eq!(first.endpoint, "http://google.fr");
+        assert_eq!(first.threads, 2);
+        assert_eq!(first.connections, 10);
+        assert_float_eq(first.latency.avg, 30.56);
+        assert_float_eq(first.latency.stddev, 12.92);
+        assert_float_eq(first.latency.max, 140.67);
+        assert_eq!(first.total_requests, 1495);
+        assert_float_eq(first.duration, 5.0);
+        assert_float_eq(first.requests_per_sec, 1.0);
+        assert_eq!(first.transfer_per_sec, "156.95KB");
+
+        // Test second result
+        let second = &collection[1];
+        assert_eq!(second.endpoint, "http://google.fr");
+        assert_eq!(second.threads, 2);
+        assert_eq!(second.connections, 10);
+        assert_float_eq(second.latency.avg, 30.56);
+        assert_float_eq(second.latency.stddev, 12.92);
+        assert_float_eq(second.latency.max, 140.67);
+        assert_eq!(second.total_requests, 1495);
+        assert_float_eq(second.duration, 5.0);
+        assert_float_eq(second.requests_per_sec, 2.0);
+        assert_eq!(second.transfer_per_sec, "156.95KB");
+    }
+
+    #[test]
+    fn test_parse_empty_input() {
+        let collection = parse_tests("");
+        assert!(collection.is_empty());
+    }
+
+    #[test]
+    fn test_parse_invalid_input() {
+        let collection = parse_tests("invalid output");
+        assert!(collection.is_empty());
     }
 }

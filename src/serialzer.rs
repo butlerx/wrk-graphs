@@ -17,8 +17,8 @@ pub enum Error {
 
 #[derive(Serialize, Deserialize, Clone, PartialEq, Debug)]
 pub struct Loadtest {
-    #[serde(default, skip_serializing_if = "parser::WrkMetrics::is_empty")]
-    pub metrics: parser::WrkMetrics,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub tests: Vec<parser::WrkMetrics>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
@@ -35,10 +35,10 @@ pub fn decode_dashboard(hash: &str) -> Result<Loadtest, Error> {
 }
 
 pub fn encode_dashboard(data: &str, desc: String, tags: Vec<String>) -> String {
-    let metrics = parser::WrkMetrics::from(data);
+    let tests = parser::parse_tests(data);
     let description = if desc.is_empty() { None } else { Some(desc) };
     let data_obj = Loadtest {
-        metrics,
+        tests,
         description,
         tags,
     };
@@ -80,7 +80,7 @@ Transfer/sec:    656.56KB
         let tags = vec!["tag1".to_string(), "tag2".to_string()];
         let hash = encode_dashboard(SAMPLE_INPUT, description.clone(), tags.clone());
         let decoded = decode_dashboard(&hash).unwrap();
-        assert_eq!(decoded.metrics.endpoint, "http://localhost:8080");
+        assert_eq!(decoded.tests[0].endpoint, "http://localhost:8080");
         assert_eq!(decoded.description, Some(description));
         assert_eq!(decoded.tags, tags);
     }

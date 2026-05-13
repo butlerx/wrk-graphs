@@ -5,5 +5,5 @@ mod percentile;
 mod request_sec;
 mod units;
 
-pub use metrics::WrkMetrics;
+pub use metrics::{parse_tests, WrkMetrics};
 pub use percentile::PercentileBucket;

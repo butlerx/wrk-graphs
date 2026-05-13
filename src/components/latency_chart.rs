@@ -24,8 +24,8 @@ pub fn latency_chart(props: &ChartProps) -> Html {
             <h3>{ "Latency" }</h3>
             <div class="metric-content">
                 <MetricRow label="Average" value={props.avg} />
-                <MetricRow label="Standard Deviation" value={props.stddev} />
                 <MetricRow label="Max" value={props.max} />
+                <MetricRow label="Standard Deviation" value={props.stddev} />
                 <div class="metric-row">
                     <div class="metric-label">{ "Standard Deviation Percent" }</div>
                     <div class="metric-value">{ format!("{:.2}%",props.stddev_percent) }</div>
