@@ -11,6 +11,7 @@ pub fn home_page() -> Html {
     let navigator = use_navigator().unwrap();
     let show_modal = use_state(|| false);
     let command = use_state(String::new);
+    let error_msg = use_state(|| Option::<String>::None);
 
     let on_header_click = {
         let navigator = navigator.clone();
@@ -26,20 +27,29 @@ pub fn home_page() -> Html {
         })
     };
 
-    let on_share = {
-        let navigator = navigator.clone();
-        Callback::from(
-            move |(data, description, tags): (String, String, Vec<String>)| {
-                let hash = encode_dashboard(&data, description, tags);
-                navigator.push(&Route::Dashboard);
-                web_sys::window()
-                    .unwrap()
-                    .location()
-                    .set_hash(&hash)
-                    .expect("Failed to set hash");
-            },
-        )
-    };
+    let on_share =
+        {
+            let navigator = navigator.clone();
+            let error_msg = error_msg.clone();
+            Callback::from(
+                move |(data, description, tags): (String, String, Vec<String>)| {
+                    match encode_dashboard(&data, description, tags) {
+                        Ok(hash) => {
+                            error_msg.set(None);
+                            navigator.push(&Route::Dashboard);
+                            web_sys::window()
+                                .unwrap()
+                                .location()
+                                .set_hash(&hash)
+                                .expect("Failed to set hash");
+                        }
+                        Err(e) => {
+                            error_msg.set(Some(e.to_string()));
+                        }
+                    }
+                },
+            )
+        };
 
     let on_show_modal = {
         let show_modal = show_modal.clone();
@@ -67,6 +77,9 @@ pub fn home_page() -> Html {
             </header>
             <div class="main-content">
                 <WrkConfig on_command_change={on_command_change} />
+                if let Some(ref err) = *error_msg {
+                    <div class="error-message">{ err }</div>
+                }
                 <div class="share-section">
                     <button class="share-button" onclick={on_show_modal}>
                         { "Share Your Load Test" }

@@ -12,6 +12,7 @@ categories  = ["graphs", "loadtest", "wasm", "web"]
 
 [dependencies]
 base64               = "0.22"
+brotli               = "8.0"
 flate2               = "1"
 gloo                 = "0.11"
 gloo-file            = "0.3"

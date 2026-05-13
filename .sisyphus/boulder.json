@@ -1,0 +1,14 @@
+{
+  "active_plan": "/Users/cbutler/projects/butlerx/wrk_graphs/.sisyphus/plans/css-theming-improvements.md",
+  "started_at": "2026-05-13T12:39:45.157Z",
+  "session_ids": [
+    "ses_1dedd73c6ffeNp0nOHZ1d7aej7",
+    "ses_1de3067beffeRwNmWIKW9SYMAt"
+  ],
+  "session_origins": {
+    "ses_1dedd73c6ffeNp0nOHZ1d7aej7": "direct",
+    "ses_1de3067beffeRwNmWIKW9SYMAt": "direct"
+  },
+  "plan_name": "css-theming-improvements",
+  "agent": "atlas"
+}

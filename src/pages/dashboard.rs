@@ -97,7 +97,7 @@ pub fn dashboard_page() -> Html {
             }
         }
         Err(e) => {
-            log::error!("Failed to decode dashboard data: {}", e);
+            log::error!("Failed to decode dashboard data: {e}");
             html! { <Redirect<Route> to={Route::Home} /> }
         }
     }
