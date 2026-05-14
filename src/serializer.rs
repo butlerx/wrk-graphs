@@ -184,6 +184,7 @@ pub fn encode_dashboard(data: &str, desc: String, tags: Vec<String>) -> Result<S
 }
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::expect_used)]
 mod test {
     use super::*;
     use crate::parser::PercentileBucket;

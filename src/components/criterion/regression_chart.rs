@@ -51,8 +51,10 @@ pub fn CriterionRegressionChart(props: &CriterionRegressionChartProps) -> Html {
 
             resize_callback();
 
-            let listener = EventListener::new(&window().unwrap(), "resize", move |_event| {
-                resize_callback();
+            let listener = window().map(|win| {
+                EventListener::new(&win, "resize", move |_event| {
+                    resize_callback();
+                })
             });
 
             move || drop(listener)

@@ -27,7 +27,9 @@ fn format_requests_float(value: f64) -> String {
 
 #[function_component(DashboardPage)]
 pub fn dashboard_page() -> Html {
-    let location = use_location().unwrap();
+    let Some(location) = use_location() else {
+        return html! { <Redirect<Route> to={Route::Home} /> };
+    };
     let hash = location.hash().trim_start_matches('#');
     let hash_string = hash.to_string();
 

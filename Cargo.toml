@@ -43,3 +43,7 @@ web-sys              = { version = "0.3", features = [
 ] }
 yew                  = { version = "0.21", features = ["csr"] }
 yew-router           = "0.18"
+
+[lints.clippy]
+expect_used = "deny"
+unwrap_used = "deny"

@@ -23,7 +23,9 @@ pub fn dashboard_header(props: &HeaderProps) -> Html {
         benchmarks,
     } = props;
 
-    let navigator = use_navigator().unwrap();
+    let Some(navigator) = use_navigator() else {
+        return html! {};
+    };
 
     let on_header_click = {
         let navigator = navigator.clone();

@@ -52,8 +52,10 @@ pub fn CriterionPdfComparisonChart(props: &CriterionPdfComparisonChartProps) -> 
 
             resize_callback();
 
-            let listener = EventListener::new(&window().unwrap(), "resize", move |_event| {
-                resize_callback();
+            let listener = window().map(|win| {
+                EventListener::new(&win, "resize", move |_event| {
+                    resize_callback();
+                })
             });
 
             move || drop(listener)
@@ -113,15 +115,15 @@ fn draw_pdf_comparison_chart(
     let mut x_max = f64::NEG_INFINITY;
     let mut max_density: f64 = 0.0;
 
-    if !current_kde.is_empty() {
-        x_min = x_min.min(current_kde.first().unwrap().0);
-        x_max = x_max.max(current_kde.last().unwrap().0);
+    if let (Some(first), Some(last)) = (current_kde.first(), current_kde.last()) {
+        x_min = x_min.min(first.0);
+        x_max = x_max.max(last.0);
         max_density = max_density.max(current_kde.iter().map(|(_, y)| *y).fold(0.0, f64::max));
     }
 
-    if !baseline_kde.is_empty() {
-        x_min = x_min.min(baseline_kde.first().unwrap().0);
-        x_max = x_max.max(baseline_kde.last().unwrap().0);
+    if let (Some(first), Some(last)) = (baseline_kde.first(), baseline_kde.last()) {
+        x_min = x_min.min(first.0);
+        x_max = x_max.max(last.0);
         max_density = max_density.max(baseline_kde.iter().map(|(_, y)| *y).fold(0.0, f64::max));
     }
 

@@ -8,7 +8,9 @@ use yew_router::prelude::*;
 
 #[function_component(HomePage)]
 pub fn home_page() -> Html {
-    let navigator = use_navigator().unwrap();
+    let Some(navigator) = use_navigator() else {
+        return html! {};
+    };
     let show_modal = use_state(|| false);
     let command = use_state(String::new);
     let error_msg = use_state(|| Option::<String>::None);

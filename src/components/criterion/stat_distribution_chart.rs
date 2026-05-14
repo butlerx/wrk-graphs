@@ -45,11 +45,13 @@ pub fn CriterionStatDistributionChart(props: &CriterionStatDistributionChartProp
 
             resize_callback();
 
-            let listener = EventListener::new(&window().unwrap(), "resize", {
-                let resize_callback = resize_callback.clone();
-                move |_event| {
-                    resize_callback();
-                }
+            let listener = window().map(|win| {
+                EventListener::new(&win, "resize", {
+                    let resize_callback = resize_callback.clone();
+                    move |_event| {
+                        resize_callback();
+                    }
+                })
             });
 
             move || drop(listener)
