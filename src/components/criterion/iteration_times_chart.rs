@@ -35,12 +35,12 @@ pub fn CriterionIterationTimesChart(props: &CriterionIterationTimesChartProps) -
     });
 
     html! {
-        <div style="position: relative">
+        <div class="chart-wrapper">
             <canvas
                 ref={canvas_ref}
                 role="img"
                 aria-label="Iteration times chart"
-                style="width: 100%; height: 100%; box-sizing: border-box"
+                class="chart-canvas"
             />
         </div>
     }

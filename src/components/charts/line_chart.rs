@@ -42,30 +42,20 @@ pub fn LineCurveChart(props: &LineCurveChartProps) -> Html {
     });
 
     html! {
-        <div style="position: relative">
+        <div class="chart-wrapper">
             <canvas
                 ref={canvas_ref}
                 role="img"
                 aria-label="Line chart visualization"
-                style="width: 100%; height: 100%; box-sizing: border-box"
+                class="chart-canvas"
             />
-            <div
-                style="
-                    position: absolute;
-                    top: 10px;
-                    right: 10px;
-                    background-color: rgba(255, 255, 255, 0.9);
-                    padding: 5px;
-                    border-radius: 4px;
-                    box-shadow: 0 2px 4px rgba(0,0,0,0.1)
-                "
-            >
-                <div style="display: flex; flex-direction: row; gap: 5px; flex-wrap: wrap">
+            <div class="chart-legend">
+                <div class="chart-legend__items">
                     { for props.data.iter().map(|(series, _)| {
                             html! {
-                                <div style="display: flex; flex-direction: row; align-items: center; gap: 2px;">
-                                    <span style="font-size: 10px;">{ &series.name }</span>
-                                    <div style={format!("background-color: {}; width: 10px; height: 10px; display: inline-block;", series.color)}></div>
+                                <div class="chart-legend__item">
+                                    <span class="chart-legend__label">{ &series.name }</span>
+                                    <div class="chart-legend__swatch" style={format!("background-color: {}", series.color)}></div>
                                 </div>
                             }
                         }) }
