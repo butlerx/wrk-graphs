@@ -140,7 +140,7 @@ mod tests {
     #[test]
     fn format_timing_seconds() {
         let result = format_timing(1500.0);
-        assert!(result.contains("s"), "Expected s, got: {result}");
+        assert!(result.contains('s'), "Expected s, got: {result}");
         assert!(result.contains("1.500"));
     }
 
@@ -159,6 +159,6 @@ mod tests {
     #[test]
     fn format_throughput_basic() {
         assert_eq!(format_throughput(1024.0, "bytes"), "1024.00 bytes/iter");
-        assert_eq!(format_throughput(3.14, "elements"), "3.14 elements/iter");
+        assert_eq!(format_throughput(3.15, "elements"), "3.15 elements/iter");
     }
 }

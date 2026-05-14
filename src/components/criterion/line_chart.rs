@@ -40,9 +40,7 @@ pub fn criterion_line_chart(props: &CriterionLineChartProps) -> Html {
                 class="chart-canvas"
             />
             <div class="chart-legend padded">
-                <div class="legend-title">
-                    { "Legend" }
-                </div>
+                <div class="legend-title">{ "Legend" }</div>
                 <div class="legend-items column">
                     { for series.iter().map(|s| {
                             html! {
@@ -300,8 +298,8 @@ mod tests {
 
     #[test]
     fn split_benchmark_name_float_param() {
-        let result = split_benchmark_name("bench/3.14");
-        assert_eq!(result, Some(("bench".to_string(), 3.14)));
+        let result = split_benchmark_name("bench/3.15");
+        assert_eq!(result, Some(("bench".to_string(), 3.15)));
     }
 
     #[test]
@@ -322,7 +320,7 @@ mod tests {
 
     #[test]
     fn format_number_fractional() {
-        assert_eq!(format_number(3.14), "3.14");
+        assert_eq!(format_number(3.15), "3.15");
         assert_eq!(format_number(0.5), "0.50");
     }
 
@@ -347,7 +345,7 @@ mod tests {
     #[test]
     fn format_ms_seconds() {
         let result = format_ms(1500.0);
-        assert!(result.contains("s"), "Expected s, got: {result}");
+        assert!(result.contains('s'), "Expected s, got: {result}");
         assert!(!result.contains("ms"));
     }
 }
