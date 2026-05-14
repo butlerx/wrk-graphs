@@ -1,4 +1,4 @@
-use wasm_bindgen::prelude::*;
+use gloo::timers::callback::Timeout;
 use yew::prelude::*;
 
 #[derive(Properties, PartialEq)]
@@ -11,32 +11,30 @@ pub struct CopyButtonProps {
 pub fn copy_button(props: &CopyButtonProps) -> Html {
     let CopyButtonProps { content, label } = props;
     let copied = use_state(|| false);
-    let window = web_sys::window().expect("window will exist");
+    let timeout_handle = use_mut_ref(|| None::<Timeout>);
 
     let on_copy = {
-        let window = window.clone();
         let copied = copied.clone();
         let content = content.clone();
+        let timeout_handle = timeout_handle.clone();
         Callback::from(move |_| {
+            let Some(window) = web_sys::window() else {
+                return;
+            };
             let _ = window.navigator().clipboard().write_text(&content);
 
             copied.set(true);
 
-            let window = window.clone();
             let copied = copied.clone();
-            let closure = Closure::once(move || {
+            let handle = Timeout::new(2_000, move || {
                 copied.set(false);
             });
-            let _ = window.set_timeout_with_callback_and_timeout_and_arguments_0(
-                closure.as_ref().unchecked_ref(),
-                2000,
-            );
-            closure.forget();
+            *timeout_handle.borrow_mut() = Some(handle);
         })
     };
 
     html! {
-        <button onclick={on_copy} class="share-button">
+        <button onclick={on_copy} class="share-button" aria-label={format!("Copy {label} to clipboard")}>
             { if *copied { "Copied!" } else { label } }
         </button>
     }

@@ -1,26 +1,65 @@
 :root {
-  /* Colors */
-  --color-bg-primary: #333333; /* Dark background for header */
-  --color-bg-secondary: #ffffff; /* Light background for panels */
-  --color-bg-tertiary: #f8f8f8; /* Slightly darker light background */
-  --color-text-primary: #ffffff; /* White text for dark background */
-  --color-text-secondary: #cccccc; /* Light gray text for dark background */
-  --color-text-on-light: #000000; /* Black text for light background */
-  --color-text-secondary-on-light: #444444; /* Dark gray text for light background */
-  --color-accent: #ff6b6b; /* Pink/red accent */
-  --color-accent-hover: #ff5252; /* Darker pink/red */
-  --color-border: #000000; /* Black borders */
-  --color-error: #ff0000; /* Red error text */
-  --color-link: #0000ff; /* Blue links */
+  /* ==========================================================================
+   * Base16 Palette — "Eighties" warm monochrome scheme.
+   * Used for the app shell (body, dark sections, criterion charts).
+   * ========================================================================== */
+  --main-base-00: #2d2d2d;
+  --main-base-01: #393939;
+  --main-base-02: #515151;
+  --main-base-03: #747369;
+  --main-base-04: #a09f93;
+  --main-base-05: #d3d0c8;
+  --main-base-06: #e8e6df;
+  --main-base-07: #f2f0ec;
+  --main-base-08: #f2777a;
+  --main-base-09: #f99157;
+  --main-base-0a: #fc6;
+  --main-base-0b: #9c9;
+  --main-base-0c: #6cc;
+  --main-base-0d: #69c;
+  --main-base-0e: #c9c;
+  --main-base-0f: #d27b53;
+
+  /* ==========================================================================
+   * Semantic Tokens — high-contrast colors for panels, text, and UI chrome.
+   * ========================================================================== */
+
+  /* Backgrounds */
+  --color-bg-primary: #333333;
+  --color-bg-secondary: #ffffff;
+  --color-bg-tertiary: #f8f8f8;
+
+  /* Text */
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #cccccc;
+  --color-text-on-light: #000000;
+  --color-text-secondary-on-light: #444444;
+
+  /* Accent */
+  --color-accent: #ff6b6b;
+  --color-accent-hover: #ff5252;
+
+  /* Borders & Feedback */
+  --color-border: #000000;
+  --color-error: #ff0000;
+  --color-link: #0000ff;
 
   /* Graph Colors */
-  --graph-line-color: #000000; /* Black graph line */
-  --graph-point-color: #ff6b6b; /* Pink/red graph points */
-  --graph-grid-color: #cccccc; /* Light gray grid lines */
-  --graph-text-color: #000000; /* Black graph text */
-  --graph-background: #ffffff; /* White graph background */
-  --graph-axis-color: #000000; /* Black axis lines */
-  --graph-hover-color: #ff5252; /* Darker pink/red on hover */
+  --graph-line-color: #000000;
+  --graph-point-color: #ff6b6b;
+  --graph-grid-color: #cccccc;
+  --graph-text-color: #000000;
+  --graph-background: #ffffff;
+  --graph-axis-color: #000000;
+  --graph-hover-color: #ff5252;
+
+  /* ==========================================================================
+   * Layout & Typography
+   * ========================================================================== */
+  --font-family-mono: 'Source Code Pro', monospace;
+  --container-max-width: 1200px;
+  --main-max-width: 52em;
+  --main-max-width-lg: 60em;
 
   /* Spacing */
   --spacing-xs: 0.25rem;
@@ -41,10 +80,9 @@
   /* Transitions */
   --transition-fast: 0.2s ease;
 
-  /* Container */
-  --container-max-width: 1200px;
-
-  /* xkcd specific colors (for reference) */
+  /* ==========================================================================
+   * xkcd chart palette (canvas rendering, not CSS usage)
+   * ========================================================================== */
   --xkcd-blue: #0000ff;
   --xkcd-red: #ff0000;
   --xkcd-green: #00ff00;
@@ -56,24 +94,4 @@
   --xkcd-gray: #808080;
   --xkcd-black: #000000;
   --xkcd-white: #ffffff;
-
-  --main-base-00: #2d2d2d;
-  --main-base-01: #393939;
-  --main-base-02: #515151;
-  --main-base-03: #747369;
-  --main-base-04: #a09f93;
-  --main-base-05: #d3d0c8;
-  --main-base-06: #e8e6df;
-  --main-base-07: #f2f0ec;
-  --main-base-08: #f2777a;
-  --main-base-09: #f99157;
-  --main-base-0a: #fc6;
-  --main-base-0b: #9c9;
-  --main-base-0c: #6cc;
-  --main-base-0d: #69c;
-  --main-base-0e: #c9c;
-  --main-base-0f: #d27b53;
-  --main-max-width: 52em;
-  --main-max-width-lg: 60em;
-  --main-fonts: 'Source Code Pro', monospace;
 }

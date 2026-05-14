@@ -1,10 +1,10 @@
 #![allow(clippy::cast_possible_truncation)]
 #![allow(clippy::cast_sign_loss)]
 use gloo::events::EventListener;
-use web_sys::{wasm_bindgen::JsCast, window, CanvasRenderingContext2d, HtmlCanvasElement};
+use web_sys::{window, CanvasRenderingContext2d};
 use yew::prelude::*;
 
-use super::chart_utils::{self, map_y, ChartMargins};
+use super::chart_utils::{self, map_y, setup_canvas, ChartMargins};
 
 #[derive(Clone, Debug, PartialEq, PartialOrd, Properties, Default)]
 pub struct LineCurveChartConfig {
@@ -42,38 +42,12 @@ pub fn LineCurveChart(props: &LineCurveChartProps) -> Html {
         let canvas_ref = canvas_ref.clone();
         let props_clone = props.clone();
         use_effect_with((), move |()| {
-            let canvas = canvas_ref
-                .cast::<HtmlCanvasElement>()
-                .expect("Failed to get canvas element");
-
-            let context = canvas
-                .get_context("2d")
-                .unwrap()
-                .unwrap()
-                .dyn_into::<CanvasRenderingContext2d>()
-                .unwrap();
-
-            let props_clone_resize = props_clone.clone();
             let resize_callback = {
                 let canvas_ref = canvas_ref.clone();
                 move || {
-                    let canvas = canvas_ref
-                        .cast::<HtmlCanvasElement>()
-                        .expect("Failed to get canvas element");
-
-                    let device_pixel_ratio = window().unwrap().device_pixel_ratio();
-                    let parent = canvas.parent_element().unwrap();
-                    let width = f64::from(parent.client_width());
-                    let height = width * 0.6;
-
-                    canvas.set_width((width * device_pixel_ratio) as u32);
-                    canvas.set_height((height * device_pixel_ratio) as u32);
-
-                    context
-                        .scale(device_pixel_ratio, device_pixel_ratio)
-                        .unwrap();
-
-                    draw_multiline_chart(&context, width, height, &props_clone_resize);
+                    if let Some((ctx, w, h)) = setup_canvas(&canvas_ref) {
+                        draw_multiline_chart(&ctx, w, h, &props_clone);
+                    }
                 }
             };
 
@@ -89,7 +63,7 @@ pub fn LineCurveChart(props: &LineCurveChartProps) -> Html {
 
     html! {
         <div style="position: relative">
-            <canvas ref={canvas_ref} style="width: 100%; height: 100%; box-sizing: border-box" />
+            <canvas ref={canvas_ref} role="img" aria-label="Line chart visualization" style="width: 100%; height: 100%; box-sizing: border-box" />
             <div
                 style="
                     position: absolute;
@@ -162,7 +136,7 @@ fn get_max_value(props: &LineCurveChartProps) -> f64 {
         .data
         .iter()
         .flat_map(|(_, data)| data.iter().map(|(_, y)| *y))
-        .max_by(|a, b| a.partial_cmp(b).unwrap())
+        .max_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal))
         .unwrap_or(0.0)
         * 1.2
 }
@@ -196,10 +170,12 @@ fn draw_datasets(
 ) {
     let datasets = &props.data;
     for (series, data) in datasets {
+        let Some(first_point) = data.first() else {
+            continue;
+        };
         context.set_stroke_style_str(series.color.as_str());
         context.set_line_width(f64::from(props.config.stroke_width));
         context.begin_path();
-        let first_point = data.first().unwrap();
         let first_x = m.left + first_point.0 * point_spacing;
         let first_y = map_y(first_point.1, 0.0, max_value, height, m);
         context.move_to(first_x, first_y);
@@ -219,13 +195,14 @@ fn draw_datasets(
         }
         context.stroke();
         if props.config.show_area_chart {
-            let last_point = data.last().unwrap();
-            context.line_to(m.left + last_point.0 * point_spacing, height - m.bottom);
-            context.line_to(m.left, height - m.bottom);
-            context.close_path();
-            let fill_color = format!("{}33", &series.color);
-            context.set_fill_style_str(&fill_color);
-            context.fill();
+            if let Some(last_point) = data.last() {
+                context.line_to(m.left + last_point.0 * point_spacing, height - m.bottom);
+                context.line_to(m.left, height - m.bottom);
+                context.close_path();
+                let fill_color = format!("{}33", &series.color);
+                context.set_fill_style_str(&fill_color);
+                context.fill();
+            }
         }
         if props.config.show_inflection_points {
             context.set_fill_style_str(series.color.as_str());
@@ -233,9 +210,7 @@ fn draw_datasets(
                 let x = m.left + point.0 * point_spacing;
                 let y = map_y(point.1, 0.0, max_value, height, m);
                 context.begin_path();
-                context
-                    .arc(x, y, 2.0, 1.0, std::f64::consts::PI * 2.0)
-                    .unwrap();
+                let _ = context.arc(x, y, 2.0, 1.0, std::f64::consts::PI * 2.0);
                 context.fill();
                 context.set_fill_style_str(series.color.as_str());
                 context.set_font("0.5em monospace");
@@ -246,9 +221,7 @@ fn draw_datasets(
                 } else {
                     "top"
                 });
-                context
-                    .fill_text(&format!("{:.2}", point.1), x, y + y_offset)
-                    .unwrap();
+                let _ = context.fill_text(&format!("{:.2}", point.1), x, y + y_offset);
             }
         }
         context.set_font("10px monospace");
@@ -272,6 +245,6 @@ fn draw_x_axis_labels(
     for (i, x_label) in x_labels.enumerate() {
         let x = m.left + (f64::from(i as u32) * 10.0) * point_spacing;
         let y = height - m.bottom + 10.0;
-        context.fill_text(x_label.as_str(), x, y).unwrap();
+        let _ = context.fill_text(x_label.as_str(), x, y);
     }
 }

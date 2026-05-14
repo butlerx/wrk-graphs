@@ -16,7 +16,7 @@ pub fn latency_chart(props: &ChartProps) -> Html {
     latency_distribution.sort_by(|a, b| {
         parse_percent_float(a.0)
             .partial_cmp(&parse_percent_float(b.0))
-            .expect("NaN values not allowed")
+            .unwrap_or(std::cmp::Ordering::Equal)
     });
 
     html! {

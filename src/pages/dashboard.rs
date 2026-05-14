@@ -3,7 +3,7 @@ use crate::{
         CriterionBenchmark, CriterionGroupChart, DashboardHeader, LatencyChart,
         LatencyPercentileChart, MetricPanel, RequestsPerSecChart,
     },
-    serialzer::decode_dashboard,
+    serializer::decode_dashboard,
     Route,
 };
 use yew::prelude::*;

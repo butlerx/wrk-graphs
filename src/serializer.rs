@@ -12,6 +12,8 @@ const BROTLI_VERSION_BYTE: u8 = 0x00;
 pub enum Error {
     #[error("Failed to decode base64: {0}")]
     Base64Decode(#[from] base64::DecodeError),
+    #[error("Failed to serialize data: {0}")]
+    Serialize(#[from] rmp_serde::encode::Error),
     #[error("Failed to deserialize data: {0}")]
     Deserialize(#[from] rmp_serde::decode::Error),
     #[error("Failed to compress/decompress data: {0}")]
@@ -158,15 +160,13 @@ pub fn encode_dashboard(data: &str, desc: String, tags: Vec<String>) -> Result<S
     };
 
     let mut buf = Vec::new();
-    data_obj
-        .serialize(&mut rmp_serde::Serializer::new(&mut buf).with_struct_map())
-        .unwrap();
+    data_obj.serialize(&mut rmp_serde::Serializer::new(&mut buf).with_struct_map())?;
 
     let mut compressed = Vec::new();
     compressed.push(BROTLI_VERSION_BYTE);
 
     let params = brotli::enc::BrotliEncoderParams {
-        quality: 11,
+        quality: 6,
         ..Default::default()
     };
     brotli::BrotliCompress(&mut &buf[..], &mut compressed, &params)?;
@@ -311,5 +311,64 @@ mod test {
             matches!(err, Error::UrlTooLong { .. }),
             "Expected UrlTooLong, got: {err:?}"
         );
+    }
+
+    #[test]
+    fn test_empty_input_produces_valid_hash() {
+        let hash = encode_dashboard("", String::new(), vec![]).unwrap();
+        let decoded = decode_dashboard(&hash).unwrap();
+        assert!(decoded.tests.is_empty());
+        assert!(decoded.benchmarks.is_empty());
+        assert_eq!(decoded.description, None);
+        assert!(decoded.tags.is_empty());
+    }
+
+    #[test]
+    fn test_decode_empty_string_returns_error() {
+        let result = decode_dashboard("");
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_decode_corrupt_brotli_payload() {
+        // Valid base64 but starts with 0x00 (brotli marker) followed by garbage
+        let payload = [0x00u8, 0xFF, 0xFE, 0xFD, 0xFC, 0xFB];
+        let hash = BASE64_URL_SAFE_NO_PAD.encode(payload);
+        let result = decode_dashboard(&hash);
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_decode_corrupt_zlib_payload() {
+        // Valid base64 but does NOT start with 0x00, so treated as zlib — but it's garbage
+        let payload = [0x78, 0xFF, 0xFE, 0xFD, 0xFC, 0xFB];
+        let hash = BASE64_URL_SAFE_NO_PAD.encode(payload);
+        let result = decode_dashboard(&hash);
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_decode_valid_brotli_but_invalid_msgpack() {
+        // Compress valid bytes that aren't valid msgpack
+        let garbage = b"this is not msgpack data at all";
+        let mut compressed = vec![BROTLI_VERSION_BYTE];
+        let params = brotli::enc::BrotliEncoderParams {
+            quality: 1,
+            ..Default::default()
+        };
+        brotli::BrotliCompress(&mut &garbage[..], &mut compressed, &params).unwrap();
+        let hash = BASE64_URL_SAFE_NO_PAD.encode(&compressed);
+        let result = decode_dashboard(&hash);
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_roundtrip_with_special_characters() {
+        let desc = "Ünïcödé 🚀 <script>alert('xss')</script> \"quotes\" & ampersand".to_string();
+        let tags = vec!["tag/with/slashes".to_string(), "spaced tag".to_string()];
+        let hash = encode_dashboard(SAMPLE_INPUT, desc.clone(), tags.clone()).unwrap();
+        let decoded = decode_dashboard(&hash).unwrap();
+        assert_eq!(decoded.description, Some(desc));
+        assert_eq!(decoded.tags, tags);
     }
 }

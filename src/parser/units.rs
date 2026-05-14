@@ -1,24 +1,25 @@
-pub fn parse_to_milliseconds(value: &str) -> f64 {
+fn split_num_unit(value: &str) -> (f64, String) {
     let value = value.trim();
     let (num_str, unit): (String, String) =
         value.chars().partition(|c| c.is_ascii_digit() || *c == '.');
+    (
+        num_str.parse::<f64>().unwrap_or(0.0),
+        unit.trim().to_lowercase(),
+    )
+}
 
-    let num = num_str.parse::<f64>().unwrap_or(0.0);
-    match unit.trim().to_lowercase().as_str() {
+pub fn parse_to_milliseconds(value: &str) -> f64 {
+    let (num, unit) = split_num_unit(value);
+    match unit.as_str() {
         "s" => num * 1000.0,
         "us" => num / 1000.0,
-        // "ms" is the default
         _ => num,
     }
 }
 
 pub fn parse_count(value: &str) -> f64 {
-    let value = value.trim();
-    let (num_str, unit): (String, String) =
-        value.chars().partition(|c| c.is_ascii_digit() || *c == '.');
-
-    let num = num_str.parse::<f64>().unwrap_or(0.0);
-    match unit.trim().to_lowercase().as_str() {
+    let (num, unit) = split_num_unit(value);
+    match unit.as_str() {
         "m" => num * 1_000_000.0,
         "k" => num * 1000.0,
         _ => num,

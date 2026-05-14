@@ -6,7 +6,7 @@ use yew_router::prelude::*;
 mod components;
 mod pages;
 mod parser;
-mod serialzer;
+mod serializer;
 
 #[derive(Clone, Routable, PartialEq)]
 pub enum Route {

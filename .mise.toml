@@ -3,6 +3,7 @@ rust                     = { version = "stable", profile = "default", components
 tombi                    = "latest"
 zizmor                   = "latest"
 "cargo:cargo-binstall"   = "latest"
+"cargo:cargo-audit"      = "latest"
 "cargo:trunk"            = "latest"
 "cargo:wasm-bindgen-cli" = "latest"
 
@@ -59,9 +60,13 @@ description = "Check code formatting"
 run         = ["cargo fmt --check", "tombi format --check"]
 sources     = ["src/**/*.rs", "Cargo.toml"]
 
+[tasks.audit]
+description = "Audit dependencies for known vulnerabilities"
+run         = "cargo audit"
+
 [tasks.check]
-description = "Run all checks (format, lint, test)"
-depends     = ["format:check", "lint", "test"]
+description = "Run all checks (format, lint, test, audit)"
+depends     = ["format:check", "lint", "test", "audit"]
 
 [tasks."check:actions"]
 description = "Lint GitHub Actions workflows"

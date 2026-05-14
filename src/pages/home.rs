@@ -1,6 +1,6 @@
 use crate::{
     components::{ShareModal, WrkConfig},
-    serialzer::encode_dashboard,
+    serializer::encode_dashboard,
     Route,
 };
 use yew::prelude::*;
@@ -37,11 +37,9 @@ pub fn home_page() -> Html {
                         Ok(hash) => {
                             error_msg.set(None);
                             navigator.push(&Route::Dashboard);
-                            web_sys::window()
-                                .unwrap()
-                                .location()
-                                .set_hash(&hash)
-                                .expect("Failed to set hash");
+                            if let Some(window) = web_sys::window() {
+                                let _ = window.location().set_hash(&hash);
+                            }
                         }
                         Err(e) => {
                             error_msg.set(Some(e.to_string()));
@@ -69,8 +67,8 @@ pub fn home_page() -> Html {
         <div class="container">
             <header class="dashboard-header">
                 <div class="header-content">
-                    <div class="header-left" onclick={on_header_click}>
-                        <img src="./icon.png" alt="Logo" class="header-icon" />
+                    <div class="header-left" onclick={on_header_click} role="button" tabindex="0" aria-label="Go to home page">
+                        <img src="./icon.png" alt="Load Test Generator logo" class="header-icon" />
                         <h1>{ "Load Test Generator" }</h1>
                     </div>
                 </div>

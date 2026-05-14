@@ -1,5 +1,4 @@
-use wasm_bindgen::prelude::*;
-use wasm_bindgen_futures::spawn_local;
+use gloo::timers::callback::Timeout;
 use yew::prelude::*;
 
 #[derive(Clone, PartialEq, Properties)]
@@ -17,6 +16,7 @@ pub fn wrk_config(props: &WrkConfigProps) -> Html {
     let timeout = use_state(|| 2);
     let script = use_state(String::new);
     let copied = use_state(|| false);
+    let timeout_handle = use_mut_ref(|| None::<Timeout>);
 
     let command = {
         let url = url.clone();
@@ -206,26 +206,17 @@ pub fn wrk_config(props: &WrkConfigProps) -> Html {
                     class={classes!("copy-button", if *copied { "copied" } else { "" })}
                     onclick={let command = command.clone();
                     let copied = copied.clone();
+                    let timeout_handle = timeout_handle.clone();
                     Callback::from(move |_| {
-                        let window = web_sys::window().unwrap();
-                        let navigator = window.navigator();
-                        let clipboard = navigator.clipboard();
-                        let command = command.clone();
+                        let Some(window) = web_sys::window() else { return; };
+                        let _ = window.navigator().clipboard().write_text(&command);
+                        copied.set(true);
+
                         let copied = copied.clone();
-                        spawn_local(async move {
-                            let _ = clipboard.write_text(&command);
-                            copied.set(true);
-                            // Reset the copied state after 2 seconds
-                            let window = web_sys::window().unwrap();
-                            let closure = Closure::once(move || {
-                                copied.set(false);
-                            });
-                            let _ = window.set_timeout_with_callback_and_timeout_and_arguments_0(
-                                closure.as_ref().unchecked_ref(),
-                                2000,
-                            );
-                            closure.forget(); // Prevent the closure from being dropped
+                        let handle = Timeout::new(2_000, move || {
+                            copied.set(false);
                         });
+                        *timeout_handle.borrow_mut() = Some(handle);
                     })}
                 >
                     { if *copied { "Copied!" } else { "Copy to Clipboard" } }

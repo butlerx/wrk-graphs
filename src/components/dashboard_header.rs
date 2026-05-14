@@ -32,8 +32,12 @@ pub fn dashboard_header(props: &HeaderProps) -> Html {
         })
     };
 
-    let window = web_sys::window().expect("window will exist");
-    let url = format!("{}/dashboard#{}", window.location().origin().unwrap(), hash);
+    let url = web_sys::window()
+        .and_then(|w| w.location().origin().ok())
+        .map_or_else(
+            || format!("/dashboard#{hash}"),
+            |origin| format!("{origin}/dashboard#{hash}"),
+        );
     let embed_code = format!(
         "<iframe src=\"{url}\" width=\"100%\" height=\"600px\" frameborder=\"0\"></iframe>"
     );
@@ -41,8 +45,8 @@ pub fn dashboard_header(props: &HeaderProps) -> Html {
     html! {
         <header class="dashboard-header">
             <div class="header-content">
-                <div class="header-left" onclick={on_header_click}>
-                    <img src="./icon.png" alt="Logo" class="header-icon" />
+                <div class="header-left" onclick={on_header_click} role="button" tabindex="0" aria-label="Go to home page">
+                    <img src="./icon.png" alt="Benchmark Results logo" class="header-icon" />
                     <h1>{ "Benchmark Results" }</h1>
                 </div>
                 <div class="share-buttons">

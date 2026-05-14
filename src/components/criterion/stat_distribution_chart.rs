@@ -4,11 +4,11 @@
 
 use crate::parser::criterion::ConfidenceInterval;
 use gloo::events::EventListener;
-use web_sys::{wasm_bindgen::JsCast, window, CanvasRenderingContext2d, HtmlCanvasElement};
+use web_sys::{window, CanvasRenderingContext2d};
 use yew::prelude::*;
 
 use crate::components::charts::chart_utils::{
-    draw_axes, draw_x_grid_and_labels, map_x, map_y, ChartMargins, GridConfig,
+    draw_axes, draw_x_grid_and_labels, map_x, map_y, setup_canvas, ChartMargins, GridConfig,
 };
 
 #[derive(Clone, Debug, PartialEq, Properties)]
@@ -33,39 +33,13 @@ pub fn CriterionStatDistributionChart(props: &CriterionStatDistributionChartProp
         let canvas_ref = canvas_ref.clone();
         let props = props.clone();
         use_effect_with((), move |()| {
-            let canvas = canvas_ref
-                .cast::<HtmlCanvasElement>()
-                .expect("Failed to get canvas element");
-
-            let context = canvas
-                .get_context("2d")
-                .unwrap()
-                .unwrap()
-                .dyn_into::<CanvasRenderingContext2d>()
-                .unwrap();
-
-            let props_clone = props.clone();
             let resize_callback = {
                 let canvas_ref = canvas_ref.clone();
-                let context = context.clone();
+                let props = props.clone();
                 move || {
-                    let canvas = canvas_ref
-                        .cast::<HtmlCanvasElement>()
-                        .expect("Failed to get canvas element");
-
-                    let device_pixel_ratio = window().unwrap().device_pixel_ratio();
-                    let parent = canvas.parent_element().unwrap();
-                    let width = f64::from(parent.client_width());
-                    let height = width * 0.6;
-
-                    canvas.set_width((width * device_pixel_ratio) as u32);
-                    canvas.set_height((height * device_pixel_ratio) as u32);
-
-                    context
-                        .scale(device_pixel_ratio, device_pixel_ratio)
-                        .unwrap();
-
-                    draw_chart(&context, width, height, &props_clone);
+                    if let Some((context, width, height)) = setup_canvas(&canvas_ref) {
+                        draw_chart(&context, width, height, &props);
+                    }
                 }
             };
 
@@ -84,7 +58,7 @@ pub fn CriterionStatDistributionChart(props: &CriterionStatDistributionChartProp
 
     html! {
         <div style="position: relative; width: 100%">
-            <canvas ref={canvas_ref} style="width: 100%; display: block" />
+            <canvas ref={canvas_ref} role="img" aria-label="Statistical distribution chart" style="width: 100%; display: block" />
         </div>
     }
 }

@@ -2,12 +2,12 @@
 #![allow(clippy::cast_sign_loss)]
 #![allow(clippy::cast_precision_loss)]
 use gloo::events::EventListener;
-use web_sys::{wasm_bindgen::JsCast, window, CanvasRenderingContext2d, HtmlCanvasElement};
+use web_sys::{window, CanvasRenderingContext2d};
 use yew::prelude::*;
 
 use crate::components::charts::chart_utils::{
     draw_axes, draw_axis_titles, draw_x_grid_and_labels, draw_y_grid_and_labels, format_tick_value,
-    map_x, map_y, ChartMargins, GridConfig,
+    map_x, map_y, setup_canvas, ChartMargins, GridConfig,
 };
 
 const PRIMARY_COLOR: &str = "rgb(31, 120, 180)";
@@ -35,38 +35,13 @@ pub fn CriterionIterationTimesChart(props: &CriterionIterationTimesChartProps) -
         let canvas_ref = canvas_ref.clone();
         let props_clone = props.clone();
         use_effect_with((), move |()| {
-            let canvas = canvas_ref
-                .cast::<HtmlCanvasElement>()
-                .expect("Failed to get canvas element");
-
-            let context = canvas
-                .get_context("2d")
-                .unwrap()
-                .unwrap()
-                .dyn_into::<CanvasRenderingContext2d>()
-                .unwrap();
-
-            let props_clone_resize = props_clone.clone();
             let resize_callback = {
                 let canvas_ref = canvas_ref.clone();
+                let props = props_clone.clone();
                 move || {
-                    let canvas = canvas_ref
-                        .cast::<HtmlCanvasElement>()
-                        .expect("Failed to get canvas element");
-
-                    let device_pixel_ratio = window().unwrap().device_pixel_ratio();
-                    let parent = canvas.parent_element().unwrap();
-                    let width = f64::from(parent.client_width());
-                    let height = width * 0.6;
-
-                    canvas.set_width((width * device_pixel_ratio) as u32);
-                    canvas.set_height((height * device_pixel_ratio) as u32);
-
-                    context
-                        .scale(device_pixel_ratio, device_pixel_ratio)
-                        .unwrap();
-
-                    draw_iteration_times_chart(&context, width, height, &props_clone_resize);
+                    if let Some((context, width, height)) = setup_canvas(&canvas_ref) {
+                        draw_iteration_times_chart(&context, width, height, &props);
+                    }
                 }
             };
 
@@ -82,7 +57,7 @@ pub fn CriterionIterationTimesChart(props: &CriterionIterationTimesChartProps) -
 
     html! {
         <div style="position: relative">
-            <canvas ref={canvas_ref} style="width: 100%; height: 100%; box-sizing: border-box" />
+            <canvas ref={canvas_ref} role="img" aria-label="Iteration times chart" style="width: 100%; height: 100%; box-sizing: border-box" />
         </div>
     }
 }
@@ -194,9 +169,7 @@ fn draw_scatter_points(
         let px = map_x(*x, area.x_min, area.x_max, area.width, m);
         let py = map_y(*y, area.y_min, area.y_max, area.height, m);
         context.begin_path();
-        context
-            .arc(px, py, 2.5, 0.0, std::f64::consts::PI * 2.0)
-            .unwrap();
+        let _ = context.arc(px, py, 2.5, 0.0, std::f64::consts::PI * 2.0);
         context.fill();
     }
 }

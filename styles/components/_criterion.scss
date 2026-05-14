@@ -88,7 +88,7 @@
   .confidence-interval {
     font-size: 0.9rem;
     color: var(--color-text-secondary-on-light);
-    font-family: var(--main-fonts);
+    font-family: var(--font-family-mono);
     margin-top: var(--spacing-xs);
   }
 
@@ -126,7 +126,7 @@
   table {
     width: 100%;
     border-collapse: collapse;
-    font-family: var(--main-fonts);
+    font-family: var(--font-family-mono);
     font-size: 0.9rem;
   }
 

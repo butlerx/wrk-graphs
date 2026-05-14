@@ -48,10 +48,8 @@ impl Component for ShareModal {
                         let file_name = file_name.clone();
 
                         read_as_text(&file, move |res| {
-                            link.send_message(Msg::LoadedText(
-                                file_name.clone(),
-                                res.expect("Failed to read file"),
-                            ));
+                            let text = res.unwrap_or_default();
+                            link.send_message(Msg::LoadedText(file_name.clone(), text));
                         })
                     };
                     self.readers.insert(file_name, task);
@@ -94,12 +92,13 @@ impl Component for ShareModal {
             let mut selected_files = Vec::new();
             let input: HtmlInputElement = e.target_unchecked_into();
             if let Some(files) = input.files() {
-                let files = js_sys::try_iter(&files)
-                    .unwrap()
-                    .unwrap()
-                    .map(|v| web_sys::File::from(v.unwrap()))
-                    .map(File::from);
-                selected_files.extend(files);
+                if let Some(iter) = js_sys::try_iter(&files).ok().flatten() {
+                    let files = iter
+                        .filter_map(Result::ok)
+                        .map(web_sys::File::from)
+                        .map(File::from);
+                    selected_files.extend(files);
+                }
             }
             Msg::Files(selected_files)
         });
@@ -122,13 +121,14 @@ impl Component for ShareModal {
         let on_submit = ctx.link().callback(|_| Msg::Submit);
 
         html! {
-            <div class="modal-overlay">
+            <div class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="share-modal-title">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h2>{ "Share Load Test Results" }</h2>
+                        <h2 id="share-modal-title">{ "Share Load Test Results" }</h2>
                         <button
                             class="close-button"
                             onclick={let on_close = on_close.clone(); Callback::from(move |_| on_close.emit(()))}
+                            aria-label="Close modal"
                         >
                             { "×" }
                         </button>
@@ -144,7 +144,7 @@ impl Component for ShareModal {
                                 value={self.files_content.first().unwrap_or(&String::new()).clone()}
                                 onchange={on_textarea_change}
                             />
-                            <input type="file" onchange={on_file_change} multiple=false />
+                            <input type="file" onchange={on_file_change} multiple=false aria-label="Upload benchmark results file" />
                         </div>
                         <div class="form-group">
                             <label for="description">{ "Description:" }</label>

@@ -1,16 +1,20 @@
 {
   "name": "WRK loadtest Results",
   "short_name": "wrk",
+  "description": "Share and visualize wrk loadtest and Criterion.rs benchmark results",
+  "id": "/wrk-graphs/",
   "theme_color": "#2d2d2d",
   "background_color": "#f2f0ec",
   "display": "minimal-ui",
-  "scope": "/",
+  "scope": "/wrk-graphs/",
   "start_url": "/wrk-graphs/",
+  "categories": ["developer tools", "utilities"],
   "icons": [
     {
       "src": "icon.png",
-      "sizes": "any",
-      "type": "image/png"
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }

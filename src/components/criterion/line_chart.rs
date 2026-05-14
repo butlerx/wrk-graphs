@@ -1,10 +1,11 @@
 #![allow(clippy::cast_possible_truncation)]
 #![allow(clippy::cast_sign_loss)]
 
+use crate::components::charts::chart_utils::setup_canvas;
 use crate::parser::criterion::CriterionMetrics;
 use gloo::events::EventListener;
 use std::collections::BTreeMap;
-use web_sys::{wasm_bindgen::JsCast, window, CanvasRenderingContext2d, HtmlCanvasElement};
+use web_sys::{window, CanvasRenderingContext2d};
 use yew::prelude::*;
 
 const PALETTE: [&str; 6] = [
@@ -32,38 +33,12 @@ pub fn criterion_line_chart(props: &CriterionLineChartProps) -> Html {
         let canvas_ref = canvas_ref.clone();
         let series_clone = series.clone();
         use_effect_with((), move |()| {
-            let canvas = canvas_ref
-                .cast::<HtmlCanvasElement>()
-                .expect("Failed to get canvas element");
-
-            let context = canvas
-                .get_context("2d")
-                .unwrap()
-                .unwrap()
-                .dyn_into::<CanvasRenderingContext2d>()
-                .unwrap();
-
             let resize_callback = {
                 let canvas_ref = canvas_ref.clone();
                 move || {
-                    let canvas = canvas_ref
-                        .cast::<HtmlCanvasElement>()
-                        .expect("Failed to get canvas element");
-
-                    let device_pixel_ratio = window().unwrap().device_pixel_ratio();
-                    let parent = canvas.parent_element().unwrap();
-                    let width = f64::from(parent.client_width());
-                    let height = width * 0.6;
-
-                    canvas.set_width((width * device_pixel_ratio) as u32);
-                    canvas.set_height((height * device_pixel_ratio) as u32);
-
-                    context.set_transform(1.0, 0.0, 0.0, 1.0, 0.0, 0.0).unwrap();
-                    context
-                        .scale(device_pixel_ratio, device_pixel_ratio)
-                        .unwrap();
-
-                    draw_chart(&context, width, height, &series_clone);
+                    if let Some((ctx, w, h)) = setup_canvas(&canvas_ref) {
+                        draw_chart(&ctx, w, h, &series_clone);
+                    }
                 }
             };
 
@@ -79,7 +54,7 @@ pub fn criterion_line_chart(props: &CriterionLineChartProps) -> Html {
 
     html! {
         <div style="position: relative;">
-            <canvas ref={canvas_ref} style="width: 100%; height: 100%; box-sizing: border-box" />
+            <canvas ref={canvas_ref} role="img" aria-label="Criterion benchmark line chart" style="width: 100%; height: 100%; box-sizing: border-box" />
             <div
                 style="
                     position: absolute;

@@ -1,4 +1,38 @@
-use web_sys::CanvasRenderingContext2d;
+use web_sys::{wasm_bindgen::JsCast, window, CanvasRenderingContext2d, HtmlCanvasElement};
+use yew::NodeRef;
+
+/// Set up a canvas element for high-DPI rendering.
+///
+/// Casts the `NodeRef` to a `HtmlCanvasElement`, obtains the 2D context, resizes
+/// the backing store to match the parent element width (with a 0.6 aspect ratio),
+/// resets the transform, and scales for the device pixel ratio.
+///
+/// Returns `None` if any step fails (e.g. canvas not yet mounted), allowing the
+/// caller to silently skip rendering instead of panicking.
+#[allow(clippy::cast_possible_truncation)]
+#[allow(clippy::cast_sign_loss)]
+pub fn setup_canvas(canvas_ref: &NodeRef) -> Option<(CanvasRenderingContext2d, f64, f64)> {
+    let canvas = canvas_ref.cast::<HtmlCanvasElement>()?;
+    let context = canvas
+        .get_context("2d")
+        .ok()??
+        .dyn_into::<CanvasRenderingContext2d>()
+        .ok()?;
+
+    let dpr = window()?.device_pixel_ratio();
+    let parent = canvas.parent_element()?;
+    let width = f64::from(parent.client_width());
+    let height = width * 0.6;
+
+    canvas.set_width((width * dpr) as u32);
+    canvas.set_height((height * dpr) as u32);
+
+    // Reset transform before scaling to prevent DPR compounding on resize.
+    context.set_transform(1.0, 0.0, 0.0, 1.0, 0.0, 0.0).ok()?;
+    context.scale(dpr, dpr).ok()?;
+
+    Some((context, width, height))
+}
 
 /// Asymmetric margins for canvas charts — enough room for tick labels + axis titles.
 pub struct ChartMargins {
