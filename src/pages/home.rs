@@ -86,7 +86,9 @@ pub fn home_page() -> Html {
                 if let Some(ref err) = *error_msg {
                     <div class="error-message">{ err }</div>
                 }
-                <div class="share-section">
+                <div
+                    class="share-section"
+                >
                     <button class="share-button" onclick={on_show_modal}>
                         { "Share Your Load Test" }
                     </button>
