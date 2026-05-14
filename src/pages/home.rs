@@ -69,7 +69,13 @@ pub fn home_page() -> Html {
         <div class="container">
             <header class="dashboard-header">
                 <div class="header-content">
-                    <div class="header-left" onclick={on_header_click} role="button" tabindex="0" aria-label="Go to home page">
+                    <div
+                        class="header-left"
+                        onclick={on_header_click}
+                        role="button"
+                        tabindex="0"
+                        aria-label="Go to home page"
+                    >
                         <img src="./icon.png" alt="Load Test Generator logo" class="header-icon" />
                         <h1>{ "Load Test Generator" }</h1>
                     </div>

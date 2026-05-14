@@ -63,7 +63,12 @@ pub fn CriterionRegressionChart(props: &CriterionRegressionChartProps) -> Html {
 
     html! {
         <div style="position: relative">
-            <canvas ref={canvas_ref} role="img" aria-label="Regression analysis chart" style="width: 100%; height: 100%; box-sizing: border-box" />
+            <canvas
+                ref={canvas_ref}
+                role="img"
+                aria-label="Regression analysis chart"
+                style="width: 100%; height: 100%; box-sizing: border-box"
+            />
         </div>
     }
 }

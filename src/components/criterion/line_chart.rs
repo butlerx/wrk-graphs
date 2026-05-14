@@ -55,8 +55,13 @@ pub fn criterion_line_chart(props: &CriterionLineChartProps) -> Html {
     }
 
     html! {
-        <div style="position: relative;">
-            <canvas ref={canvas_ref} role="img" aria-label="Criterion benchmark line chart" style="width: 100%; height: 100%; box-sizing: border-box" />
+        <div style="position: relative">
+            <canvas
+                ref={canvas_ref}
+                role="img"
+                aria-label="Criterion benchmark line chart"
+                style="width: 100%; height: 100%; box-sizing: border-box"
+            />
             <div
                 style="
                     position: absolute;
@@ -65,21 +70,21 @@ pub fn criterion_line_chart(props: &CriterionLineChartProps) -> Html {
                     background-color: rgba(255, 255, 255, 0.9);
                     padding: 6px 8px;
                     border-radius: 4px;
-                    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.1)
                 "
             >
-                <div style="font-size: 11px; font-weight: 600; margin-bottom: 4px;">{ "Legend" }</div>
-                <div style="display: flex; flex-direction: column; gap: 4px;">
-                    {
-                        for series.iter().map(|s| {
+                <div style="font-size: 11px; font-weight: 600; margin-bottom: 4px">
+                    { "Legend" }
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 4px">
+                    { for series.iter().map(|s| {
                             html! {
                                 <div style="display: flex; flex-direction: row; align-items: center; gap: 6px; font-size: 11px;">
                                     <div style={format!("background-color: {}; width: 10px; height: 10px;", s.color)}></div>
                                     <span>{ &s.name }</span>
                                 </div>
                             }
-                        })
-                    }
+                        }) }
                 </div>
             </div>
         </div>

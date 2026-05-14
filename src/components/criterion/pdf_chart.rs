@@ -60,7 +60,12 @@ pub fn CriterionPdfChart(props: &CriterionPdfChartProps) -> Html {
 
     html! {
         <div style="position: relative">
-            <canvas ref={canvas_ref} role="img" aria-label="Probability density function chart" style="width: 100%; height: 100%; box-sizing: border-box" />
+            <canvas
+                ref={canvas_ref}
+                role="img"
+                aria-label="Probability density function chart"
+                style="width: 100%; height: 100%; box-sizing: border-box"
+            />
         </div>
     }
 }

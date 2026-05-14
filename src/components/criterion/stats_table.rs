@@ -59,8 +59,7 @@ pub fn criterion_stats_table(props: &CriterionStatsTableProps) -> Html {
                     </tr>
                 </thead>
                 <tbody>
-                    {
-                        for rows.iter().map(|(label, value)| {
+                    { for rows.iter().map(|(label, value)| {
                             let (lower, estimate, upper) = format_stat_row(label, value);
                             html! {
                                 <tr>
@@ -70,8 +69,7 @@ pub fn criterion_stats_table(props: &CriterionStatsTableProps) -> Html {
                                     <td>{ upper }</td>
                                 </tr>
                             }
-                        })
-                    }
+                        }) }
                 </tbody>
             </table>
         </div>

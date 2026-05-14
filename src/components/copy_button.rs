@@ -34,7 +34,11 @@ pub fn copy_button(props: &CopyButtonProps) -> Html {
     };
 
     html! {
-        <button onclick={on_copy} class="share-button" aria-label={format!("Copy {label} to clipboard")}>
+        <button
+            onclick={on_copy}
+            class="share-button"
+            aria-label={format!("Copy {label} to clipboard")}
+        >
             { if *copied { "Copied!" } else { label } }
         </button>
     }

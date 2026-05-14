@@ -47,12 +47,14 @@ pub fn criterion_benchmark(props: &CriterionBenchmarkProps) -> Html {
     let iteration_times_html = if has_samples && bench.slope.is_none() {
         Some(html! {
             <div class="chart-panel">
-                <h4 class="chart-title">{"Iteration Times"}</h4>
+                <h4 class="chart-title">{ "Iteration Times" }</h4>
                 <CriterionIterationTimesChart
                     iteration_count={bench.iteration_count.clone()}
                     measured_values={bench.measured_values.clone()}
                 />
-                <p class="chart-description">{"This chart shows the time taken by each iteration of the benchmark. This is used when the benchmark does not do linear regression."}</p>
+                <p class="chart-description">
+                    { "This chart shows the time taken by each iteration of the benchmark. This is used when the benchmark does not do linear regression." }
+                </p>
             </div>
         })
     } else {
@@ -85,22 +87,26 @@ pub fn criterion_benchmark(props: &CriterionBenchmarkProps) -> Html {
                 if has_samples {
                     <div class="chart-row">
                         <div class="chart-panel">
-                            <h4 class="chart-title">{"Probability Density Function"}</h4>
+                            <h4 class="chart-title">{ "Probability Density Function" }</h4>
                             <CriterionPdfChart
                                 iteration_count={bench.iteration_count.clone()}
                                 measured_values={bench.measured_values.clone()}
                             />
-                            <p class="chart-description">{"This chart shows an estimate of the probability density function of time per iteration."}</p>
+                            <p class="chart-description">
+                                { "This chart shows an estimate of the probability density function of time per iteration." }
+                            </p>
                         </div>
                         if bench.slope.is_some() {
                             <div class="chart-panel">
-                                <h4 class="chart-title">{"Linear Regression"}</h4>
+                                <h4 class="chart-title">{ "Linear Regression" }</h4>
                                 <CriterionRegressionChart
                                     iteration_count={bench.iteration_count.clone()}
                                     measured_values={bench.measured_values.clone()}
                                     slope={bench.slope.clone()}
                                 />
-                                <p class="chart-description">{"This chart shows the linear regression of total time vs. number of iterations, with the confidence interval shaded."}</p>
+                                <p class="chart-description">
+                                    { "This chart shows the linear regression of total time vs. number of iterations, with the confidence interval shaded." }
+                                </p>
                             </div>
                         }
                         { for iteration_times_html }
@@ -133,11 +139,15 @@ fn render_change_panel(bench: &CriterionMetrics) -> Option<Html> {
                     <div class="metric-label">{ change_label }</div>
                     <div class="metric-row">
                         <div class="metric-label">{ "Mean" }</div>
-                        <div class="metric-value">{ format!("[{:+.3}% .. {:+.3}%]", change.mean.lower_bound, change.mean.upper_bound) }</div>
+                        <div class="metric-value">
+                            { format!("[{:+.3}% .. {:+.3}%]", change.mean.lower_bound, change.mean.upper_bound) }
+                        </div>
                     </div>
                     <div class="metric-row">
                         <div class="metric-label">{ "Median" }</div>
-                        <div class="metric-value">{ format!("{:+.3}%", change.median.estimate) }</div>
+                        <div class="metric-value">
+                            { format!("{:+.3}%", change.median.estimate) }
+                        </div>
                     </div>
                     if change.p_value > 0.0 {
                         <div class="metric-row">
@@ -159,7 +169,9 @@ fn render_outliers_panel(bench: &CriterionMetrics) -> Option<Html> {
                 <div class="metric-content">
                     <div class="metric-row">
                         <div class="metric-label">{ "Total" }</div>
-                        <div class="metric-value">{ format!("{} / {}", outliers.outlier_count, outliers.total_measurements) }</div>
+                        <div class="metric-value">
+                            { format!("{} / {}", outliers.outlier_count, outliers.total_measurements) }
+                        </div>
                     </div>
                     if outliers.mild_high > 0 {
                         <div class="metric-row">
@@ -210,7 +222,9 @@ fn render_stat_distributions(bench: &CriterionMetrics) -> Option<Html> {
     Some(html! {
         <div class="stat-distributions">
             <h4 class="stat-distributions-title">{ "Additional Statistics" }</h4>
-            <p class="stat-distributions-description">{ "These charts show the bootstrap distribution of each statistic. The shaded region represents the confidence interval for the estimate." }</p>
+            <p class="stat-distributions-description">
+                { "These charts show the bootstrap distribution of each statistic. The shaded region represents the confidence interval for the estimate." }
+            </p>
             <div class="stat-distributions-grid">
                 { for stats.into_iter().map(|(label, ci)| html! {
                     <div class="stat-distribution-panel">

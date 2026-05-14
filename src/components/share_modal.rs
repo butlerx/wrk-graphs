@@ -121,7 +121,12 @@ impl Component for ShareModal {
         let on_submit = ctx.link().callback(|_| Msg::Submit);
 
         html! {
-            <div class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="share-modal-title">
+            <div
+                class="modal-overlay"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="share-modal-title"
+            >
                 <div class="modal-content">
                     <div class="modal-header">
                         <h2 id="share-modal-title">{ "Share Load Test Results" }</h2>
@@ -144,7 +149,12 @@ impl Component for ShareModal {
                                 value={self.files_content.first().unwrap_or(&String::new()).clone()}
                                 onchange={on_textarea_change}
                             />
-                            <input type="file" onchange={on_file_change} multiple=false aria-label="Upload benchmark results file" />
+                            <input
+                                type="file"
+                                onchange={on_file_change}
+                                multiple=false
+                                aria-label="Upload benchmark results file"
+                            />
                         </div>
                         <div class="form-group">
                             <label for="description">{ "Description:" }</label>

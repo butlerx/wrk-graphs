@@ -64,7 +64,12 @@ pub fn CriterionPdfComparisonChart(props: &CriterionPdfComparisonChartProps) -> 
 
     html! {
         <div style="position: relative">
-            <canvas ref={canvas_ref} role="img" aria-label="Probability density comparison chart" style="width: 100%; height: 100%; box-sizing: border-box" />
+            <canvas
+                ref={canvas_ref}
+                role="img"
+                aria-label="Probability density comparison chart"
+                style="width: 100%; height: 100%; box-sizing: border-box"
+            />
         </div>
     }
 }

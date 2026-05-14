@@ -6,6 +6,7 @@ zizmor                   = "latest"
 "cargo:cargo-audit"      = "latest"
 "cargo:trunk"            = "latest"
 "cargo:wasm-bindgen-cli" = "latest"
+"cargo:yew-fmt"          = "latest"
 
 [settings]
 experimental   = true
@@ -51,13 +52,17 @@ run         = "cargo clippy --fix --all-targets --all-features --allow-staged ${
 
 [tasks.format]
 description = "Format code"
-run         = ["cargo fmt", "tombi format"]
+run         = ["cargo fmt", "yew-fmt src/**/*.rs", "tombi format"]
 alias       = "f"
 sources     = ["src/**/*.rs", "Cargo.toml"]
 
 [tasks."format:check"]
 description = "Check code formatting"
-run         = ["cargo fmt --check", "tombi format --check"]
+run         = [
+  "cargo fmt --check",
+  "yew-fmt --check src/**/*.rs",
+  "tombi format --check"
+]
 sources     = ["src/**/*.rs", "Cargo.toml"]
 
 [tasks.audit]

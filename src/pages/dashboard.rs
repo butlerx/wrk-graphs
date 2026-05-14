@@ -88,9 +88,11 @@ pub fn dashboard_page() -> Html {
                     }
                     if !data.benchmarks.is_empty() {
                         <div class="criterion-footer">
-                            <a href="https://bheisler.github.io/criterion.rs/book/user_guide/plots_and_graphs.html"
-                               target="_blank"
-                               rel="noopener noreferrer">
+                            <a
+                                href="https://bheisler.github.io/criterion.rs/book/user_guide/plots_and_graphs.html"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
                                 { "Understanding Criterion.rs charts →" }
                             </a>
                         </div>

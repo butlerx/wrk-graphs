@@ -60,7 +60,12 @@ pub fn CriterionStatDistributionChart(props: &CriterionStatDistributionChartProp
 
     html! {
         <div style="position: relative; width: 100%">
-            <canvas ref={canvas_ref} role="img" aria-label="Statistical distribution chart" style="width: 100%; display: block" />
+            <canvas
+                ref={canvas_ref}
+                role="img"
+                aria-label="Statistical distribution chart"
+                style="width: 100%; display: block"
+            />
         </div>
     }
 }

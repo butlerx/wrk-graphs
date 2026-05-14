@@ -29,9 +29,11 @@ pub fn criterion_group_chart(props: &CriterionGroupChartProps) -> Html {
 
     html! {
         <div class="criterion-group-chart">
-            <h4 class="chart-title">{"Benchmark Group Comparison"}</h4>
+            <h4 class="chart-title">{ "Benchmark Group Comparison" }</h4>
             <CriterionLineChart benchmarks={benchmarks.clone()} />
-            <p class="chart-description">{"This chart shows how the benchmark's execution time changes across different parameter values. Each point represents the estimated time for that input size."}</p>
+            <p class="chart-description">
+                { "This chart shows how the benchmark's execution time changes across different parameter values. Each point represents the estimated time for that input size." }
+            </p>
         </div>
     }
 }

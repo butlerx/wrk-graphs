@@ -24,21 +24,23 @@ pub fn criterion_comparison(props: &CriterionComparisonProps) -> Html {
     let comparison_charts = if has_current_samples && has_baseline_samples {
         let pdf_chart = html! {
             <div class="chart-panel">
-                <h4 class="chart-title">{"PDF Comparison"}</h4>
+                <h4 class="chart-title">{ "PDF Comparison" }</h4>
                 <CriterionPdfComparisonChart
                     iteration_count={bench.iteration_count.clone()}
                     measured_values={bench.measured_values.clone()}
                     baseline_iteration_count={baseline.iteration_count.clone()}
                     baseline_measured_values={baseline.measured_values.clone()}
                 />
-                <p class="chart-description">{"This chart shows the estimated probability density functions of the current and baseline benchmarks overlaid, highlighting shifts in performance."}</p>
+                <p class="chart-description">
+                    { "This chart shows the estimated probability density functions of the current and baseline benchmarks overlaid, highlighting shifts in performance." }
+                </p>
             </div>
         };
 
         let regression_chart = if bench.slope.is_some() || baseline.slope.is_some() {
             Some(html! {
                 <div class="chart-panel">
-                    <h4 class="chart-title">{"Regression Comparison"}</h4>
+                    <h4 class="chart-title">{ "Regression Comparison" }</h4>
                     <CriterionRegressionComparisonChart
                         iteration_count={bench.iteration_count.clone()}
                         measured_values={bench.measured_values.clone()}
@@ -47,19 +49,16 @@ pub fn criterion_comparison(props: &CriterionComparisonProps) -> Html {
                         baseline_measured_values={baseline.measured_values.clone()}
                         baseline_slope={baseline.slope.clone()}
                     />
-                    <p class="chart-description">{"This chart compares the linear regressions of the current and baseline benchmarks. A steeper slope indicates slower performance per iteration."}</p>
+                    <p class="chart-description">
+                        { "This chart compares the linear regressions of the current and baseline benchmarks. A steeper slope indicates slower performance per iteration." }
+                    </p>
                 </div>
             })
         } else {
             None
         };
 
-        Some(html! {
-            <div class="comparison-charts">
-                { pdf_chart }
-                { for regression_chart }
-            </div>
-        })
+        Some(html! { <div class="comparison-charts">{ pdf_chart }{ for regression_chart }</div> })
     } else {
         None
     };
@@ -94,7 +93,9 @@ fn render_change_distributions(change: Option<&ChangeStats>) -> Option<Html> {
     Some(html! {
         <div class="change-distributions">
             <h4 class="change-distributions-title">{ "Change Distributions" }</h4>
-            <p class="change-distributions-description">{ "These charts show the bootstrap distribution of the percentage change in each statistic relative to the previous benchmark run." }</p>
+            <p class="change-distributions-description">
+                { "These charts show the bootstrap distribution of the percentage change in each statistic relative to the previous benchmark run." }
+            </p>
             <div class="change-distributions-grid">
                 if has_mean {
                     <div class="stat-distribution-panel">
@@ -127,7 +128,7 @@ fn render_change_table(change: Option<&ChangeStats>) -> Option<Html> {
     };
 
     Some(html! {
-        <div class="criterion-stats-table" style="margin-top: var(--spacing-md);">
+        <div class="criterion-stats-table" style="margin-top: var(--spacing-md)">
             <table>
                 <thead>
                     <tr>
