@@ -1,7 +1,7 @@
 #![allow(clippy::cast_possible_truncation)]
 #![allow(clippy::cast_sign_loss)]
 
-use crate::components::charts::use_canvas;
+use crate::hooks::use_canvas;
 use crate::parser::criterion::CriterionMetrics;
 use std::collections::BTreeMap;
 use web_sys::CanvasRenderingContext2d;

@@ -4,12 +4,13 @@
 use web_sys::CanvasRenderingContext2d;
 use yew::prelude::*;
 
-use crate::components::charts::chart_utils::{
+use crate::drawing::{
     draw_axes, draw_axis_titles, draw_x_grid_and_labels, draw_y_grid_and_labels, format_tick_value,
     map_x, map_y, ChartMargins, GridConfig,
 };
-use crate::components::charts::data_utils::{compute_kde, compute_per_iteration_ms};
-use crate::components::charts::use_canvas;
+use crate::hooks::use_canvas;
+
+use super::data::{compute_kde, compute_per_iteration_ms};
 
 const PRIMARY_COLOR: &str = "rgb(31, 120, 180)";
 const AREA_COLOR: &str = "rgba(31, 120, 180, 0.2)";

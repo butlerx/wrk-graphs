@@ -1,5 +1,6 @@
 mod benchmark;
 mod comparison;
+mod data;
 mod group_chart;
 mod iteration_times_chart;
 mod line_chart;

@@ -1,4 +1,4 @@
-pub(crate) mod charts;
+mod charts;
 mod criterion;
 mod wrk;
 

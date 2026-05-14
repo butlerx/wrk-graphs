@@ -5,12 +5,13 @@ use crate::parser::criterion::ConfidenceInterval;
 use web_sys::CanvasRenderingContext2d;
 use yew::prelude::*;
 
-use crate::components::charts::chart_utils::{
+use crate::drawing::{
     draw_axes, draw_axis_titles, draw_x_grid_and_labels, draw_y_grid_and_labels, format_tick_value,
     map_x, map_y, ChartMargins, GridConfig,
 };
-use crate::components::charts::data_utils::compute_regression_points;
-use crate::components::charts::use_canvas;
+use crate::hooks::use_canvas;
+
+use super::data::compute_regression_points;
 
 const PRIMARY_COLOR: &str = "rgb(31, 120, 180)";
 const BAND_COLOR: &str = "rgba(31, 120, 180, 0.2)";

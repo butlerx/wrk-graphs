@@ -3,8 +3,8 @@
 use web_sys::CanvasRenderingContext2d;
 use yew::prelude::*;
 
-use super::chart_utils::{self, map_y, ChartMargins};
-use super::use_canvas::use_canvas;
+use crate::drawing::{self, map_y, ChartMargins};
+use crate::hooks::use_canvas;
 
 #[derive(Clone, Debug, PartialEq, PartialOrd, Properties, Default)]
 pub struct LineCurveChartConfig {
@@ -88,24 +88,24 @@ fn draw_multiline_chart(
     let max_value = get_max_value(props);
     let point_spacing = m.plot_width(width) / 100.0;
 
-    chart_utils::draw_axes(context, width, height, &m);
+    drawing::draw_axes(context, width, height, &m);
     draw_vertical_grid_lines(context, height, &m, point_spacing);
-    chart_utils::draw_y_grid_and_labels(
+    drawing::draw_y_grid_and_labels(
         context,
         width,
         height,
         &m,
-        &chart_utils::GridConfig {
+        &drawing::GridConfig {
             min: 0.0,
             max: max_value,
             num_lines: 5,
-            fmt: chart_utils::format_tick_value,
+            fmt: drawing::format_tick_value,
         },
     );
     draw_datasets(context, height, &m, point_spacing, props, max_value);
     draw_x_axis_labels(context, height, &m, point_spacing, props);
     if !props.config.x_axis_title.is_empty() || !props.config.y_axis_title.is_empty() {
-        chart_utils::draw_axis_titles(
+        drawing::draw_axis_titles(
             context,
             width,
             height,

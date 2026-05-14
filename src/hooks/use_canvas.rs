@@ -2,7 +2,7 @@ use gloo::events::EventListener;
 use web_sys::{window, CanvasRenderingContext2d};
 use yew::prelude::*;
 
-use super::chart_utils::setup_canvas;
+use crate::drawing::setup_canvas;
 
 /// Custom hook that sets up a canvas with high-DPI rendering and automatic resize handling.
 ///

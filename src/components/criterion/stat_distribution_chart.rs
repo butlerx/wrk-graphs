@@ -6,10 +6,8 @@ use crate::parser::criterion::ConfidenceInterval;
 use web_sys::CanvasRenderingContext2d;
 use yew::prelude::*;
 
-use crate::components::charts::chart_utils::{
-    draw_axes, draw_x_grid_and_labels, map_x, map_y, ChartMargins, GridConfig,
-};
-use crate::components::charts::use_canvas;
+use crate::drawing::{draw_axes, draw_x_grid_and_labels, map_x, map_y, ChartMargins, GridConfig};
+use crate::hooks::use_canvas;
 
 #[derive(Clone, Debug, PartialEq, Properties)]
 pub struct CriterionStatDistributionChartProps {
