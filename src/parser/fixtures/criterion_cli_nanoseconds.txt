@@ -1,0 +1,2 @@
+
+sort/small              time:   [245.67 ns 248.90 ns 252.13 ns]

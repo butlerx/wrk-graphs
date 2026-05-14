@@ -1,0 +1,13 @@
+
+Detailed Percentile spectrum:
+     Value   Percentile   TotalCount 1/(1-Percentile)
+
+     0.921     0.000000            1         1.00
+     4.053     0.100000         3951         1.11
+     4.935     0.200000         7921         1.25
+     5.627     0.300000        11858         1.43
+     6.179     0.400000        15803         1.67
+     6.671     0.500000        19783         inf
+#[Mean    =        6.602, StdDeviation   =        1.919]
+#[Max     =       12.496, Total count    =        39500]
+#[Buckets =           27, SubBuckets     =         2048]

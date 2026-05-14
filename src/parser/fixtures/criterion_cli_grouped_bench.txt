@@ -1,0 +1,21 @@
+
+Running benches/cache_key.rs (target/release/deps/cache_key-8b3d59ac7fb3a1a6)
+Gnuplot not found, using plotters backend
+compute_cache_key_hash/simple
+                        time:   [737.08 ns 739.53 ns 742.26 ns]
+                        change: [+55.926% +56.816% +57.716%] (p = 0.00 < 0.05)
+                        Performance has regressed.
+Found 1 outliers among 100 measurements (1.00%)
+  1 (1.00%) high severe
+Benchmarking compute_cache_key_hash/authenticated: Collecting 100 samples in estimated 5.0044 s (4.8M iter
+compute_cache_key_hash/authenticated
+                        time:   [1.0270 µs 1.0288 µs 1.0306 µs]
+                        change: [+55.699% +56.554% +57.440%] (p = 0.00 < 0.05)
+                        Performance has regressed.
+Found 2 outliers among 100 measurements (2.00%)
+  2 (2.00%) high mild
+Benchmarking compute_cache_key_hash/multi_auth: Collecting 100 samples in estimated 5.0015 s (4.6M iterati
+compute_cache_key_hash/multi_auth
+                        time:   [1.0915 µs 1.0945 µs 1.0974 µs]
+                        change: [+56.449% +57.313% +58.186%] (p = 0.00 < 0.05)
+                        Performance has regressed.

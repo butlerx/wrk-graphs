@@ -1,0 +1,11 @@
+
+Benchmarking fib/20
+Benchmarking fib/20: Warming up for 3.0000 s
+Benchmarking fib/20: Collecting 100 samples in estimated 5.0159 s (2600 iterations)
+Benchmarking fib/20: Analyzing
+fib/20                  time:   [1.9245 ms 1.9298 ms 1.9359 ms]
+                        change: [-0.5765% +0.2437% +1.1291%] (p = 0.59 > 0.05)
+                        No change in performance detected.
+Found 3 outliers among 100 measurements (3.00%)
+  2 (2.00%) high mild
+  1 (1.00%) high severe

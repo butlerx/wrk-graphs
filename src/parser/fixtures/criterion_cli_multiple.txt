@@ -1,0 +1,8 @@
+
+fib/10                  time:   [50.123 us 51.456 us 52.789 us]
+                        change: [-2.1234% -1.5678% -0.9012%] (p = 0.01 < 0.05)
+                        Performance has improved.
+
+fib/20                  time:   [1.9245 ms 1.9298 ms 1.9359 ms]
+                        change: [+1.234% +2.567% +3.890%] (p = 0.02 < 0.05)
+                        Performance has regressed.

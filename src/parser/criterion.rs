@@ -190,13 +190,37 @@ pub fn parse_cli_output(output: &str) -> Vec<CriterionMetrics> {
 fn try_parse_benchmark_block(lines: &[&str], idx: &mut usize) -> Option<CriterionMetrics> {
     let line = lines[*idx];
 
-    let time_pos = line.find("time:")?;
-    let name = line[..time_pos].trim().to_string();
-    if name.is_empty() {
-        return None;
-    }
+    let (name, time) = if let Some(time_pos) = line.find("time:") {
+        let name = line[..time_pos].trim().to_string();
+        if name.is_empty() {
+            return None;
+        }
+        let time = parse_confidence_interval(&line[time_pos + 5..])?;
+        (name, time)
+    } else {
+        let candidate = line.trim();
+        if candidate.is_empty()
+            || candidate.starts_with("Benchmarking")
+            || candidate.starts_with("Running")
+            || candidate.starts_with("Gnuplot")
+            || candidate.starts_with("Compiling")
+        {
+            return None;
+        }
+        let next = *idx + 1;
+        if next >= lines.len() {
+            return None;
+        }
+        let next_line = lines[next].trim();
+        let time_pos = next_line.find("time:")?;
+        if time_pos != 0 {
+            return None;
+        }
+        let time = parse_confidence_interval(&next_line[5..])?;
+        *idx += 1;
+        (candidate.to_string(), time)
+    };
 
-    let time = parse_confidence_interval(&line[time_pos + 5..])?;
     let mut metrics = CriterionMetrics {
         name,
         time,
@@ -235,7 +259,7 @@ fn try_parse_benchmark_block(lines: &[&str], idx: &mut usize) -> Option<Criterio
             && !line.contains("regressed")
             && !line.contains("improved")
         {
-            if is_new_benchmark_start(line) {
+            if is_new_benchmark_start(line) || is_split_benchmark_start(line, lines, *idx) {
                 break;
             }
             *idx += 1;
@@ -249,6 +273,14 @@ fn try_parse_benchmark_block(lines: &[&str], idx: &mut usize) -> Option<Criterio
 
 fn is_new_benchmark_start(line: &str) -> bool {
     !line.starts_with(' ') && !line.starts_with('\t') && line.contains("time:")
+}
+
+fn is_split_benchmark_start(line: &str, lines: &[&str], idx: usize) -> bool {
+    if line.starts_with(' ') || line.starts_with('\t') || line.is_empty() {
+        return false;
+    }
+    let next = idx + 1;
+    next < lines.len() && lines[next].trim().starts_with("time:")
 }
 
 /// Parse a confidence interval from text like `[1.9245 ms 1.9298 ms 1.9359 ms]`
@@ -797,18 +829,7 @@ mod tests {
         );
     }
 
-    const CLI_OUTPUT_SIMPLE: &str = r"
-Benchmarking fib/20
-Benchmarking fib/20: Warming up for 3.0000 s
-Benchmarking fib/20: Collecting 100 samples in estimated 5.0159 s (2600 iterations)
-Benchmarking fib/20: Analyzing
-fib/20                  time:   [1.9245 ms 1.9298 ms 1.9359 ms]
-                        change: [-0.5765% +0.2437% +1.1291%] (p = 0.59 > 0.05)
-                        No change in performance detected.
-Found 3 outliers among 100 measurements (3.00%)
-  2 (2.00%) high mild
-  1 (1.00%) high severe
-";
+    const CLI_OUTPUT_SIMPLE: &str = include_str!("fixtures/criterion_cli_simple.txt");
 
     #[test]
     fn test_parse_cli_simple() {
@@ -836,15 +857,7 @@ Found 3 outliers among 100 measurements (3.00%)
         assert_eq!(outliers.severe_high, 1);
     }
 
-    const CLI_OUTPUT_MULTIPLE: &str = r"
-fib/10                  time:   [50.123 us 51.456 us 52.789 us]
-                        change: [-2.1234% -1.5678% -0.9012%] (p = 0.01 < 0.05)
-                        Performance has improved.
-
-fib/20                  time:   [1.9245 ms 1.9298 ms 1.9359 ms]
-                        change: [+1.234% +2.567% +3.890%] (p = 0.02 < 0.05)
-                        Performance has regressed.
-";
+    const CLI_OUTPUT_MULTIPLE: &str = include_str!("fixtures/criterion_cli_multiple.txt");
 
     #[test]
     fn test_parse_cli_multiple() {
@@ -868,9 +881,7 @@ fib/20                  time:   [1.9245 ms 1.9298 ms 1.9359 ms]
         assert_eq!(change1.result, ChangeResult::Regressed);
     }
 
-    const CLI_OUTPUT_NANOSECONDS: &str = r"
-sort/small              time:   [245.67 ns 248.90 ns 252.13 ns]
-";
+    const CLI_OUTPUT_NANOSECONDS: &str = include_str!("fixtures/criterion_cli_nanoseconds.txt");
 
     #[test]
     fn test_parse_cli_nanoseconds() {
@@ -885,7 +896,7 @@ sort/small              time:   [245.67 ns 248.90 ns 252.13 ns]
         assert_float_eq(m.time.upper_bound, 0.000_252_13);
     }
 
-    const JSON_OUTPUT: &str = r#"{"reason":"benchmark-complete","id":"norm","report_directory":"target/criterion/reports/norm","iteration_count":[30,60,90],"measured_values":[124200.0,248400.0,372600.0],"unit":"ns","throughput":[{"per_iteration":1024,"unit":"elements"}],"typical":{"estimate":3419.49,"lower_bound":3375.24,"upper_bound":3465.46,"unit":"ns"},"mean":{"estimate":3419.49,"lower_bound":3375.24,"upper_bound":3465.46,"unit":"ns"},"median":{"estimate":3400.00,"lower_bound":3360.00,"upper_bound":3440.00,"unit":"ns"},"median_abs_dev":{"estimate":50.0,"lower_bound":40.0,"upper_bound":60.0,"unit":"ns"},"slope":{"estimate":3410.0,"lower_bound":3370.0,"upper_bound":3450.0,"unit":"ns"},"change":{"mean":{"estimate":0.014,"unit":"%"},"median":{"estimate":0.012,"unit":"%"},"change":"NoChange"}}"#;
+    const JSON_OUTPUT: &str = include_str!("fixtures/criterion_json_output.json");
 
     #[test]
     fn test_parse_json() {
@@ -951,7 +962,7 @@ Running 10s test @ http://localhost:8080
 
     #[test]
     fn test_parse_sample_json() {
-        let input = include_str!("../../criterion_sample.json");
+        let input = include_str!("fixtures/criterion_sample.json");
         let result = parse_sample_json(input).expect("should parse sample.json");
 
         assert_eq!(result.name, "benchmark");
@@ -976,16 +987,70 @@ Running 10s test @ http://localhost:8080
 
     #[test]
     fn test_auto_detect_sample_json() {
-        let input = include_str!("../../criterion_sample.json");
+        let input = include_str!("fixtures/criterion_sample.json");
         assert!(is_criterion_sample_json(input));
         let results = try_parse(input).expect("should auto-detect sample.json");
         assert_eq!(results.len(), 1);
         assert_eq!(results[0].name, "benchmark");
     }
 
+    const CLI_OUTPUT_GROUPED_BENCH: &str = include_str!("fixtures/criterion_cli_grouped_bench.txt");
+
+    #[test]
+    fn test_parse_cli_grouped_bench() {
+        let results = parse_cli_output(CLI_OUTPUT_GROUPED_BENCH);
+        assert_eq!(results.len(), 3);
+
+        // First benchmark: nanoseconds
+        let simple = &results[0];
+        assert_eq!(simple.name, "compute_cache_key_hash/simple");
+        assert_float_eq(simple.time.lower_bound, 0.000_737_08);
+        assert_float_eq(simple.time.estimate, 0.000_739_53);
+        assert_float_eq(simple.time.upper_bound, 0.000_742_26);
+        assert_eq!(simple.time.unit, TimeUnit::Milliseconds);
+
+        let change = simple.change.as_ref().unwrap();
+        assert_float_eq(change.mean.lower_bound, 55.926);
+        assert_float_eq(change.mean.estimate, 56.816);
+        assert_float_eq(change.mean.upper_bound, 57.716);
+        assert_float_eq(change.p_value, 0.0);
+        assert_eq!(change.result, ChangeResult::Regressed);
+
+        let outliers = simple.outliers.as_ref().unwrap();
+        assert_eq!(outliers.outlier_count, 1);
+        assert_eq!(outliers.total_measurements, 100);
+        assert_eq!(outliers.severe_high, 1);
+
+        // Second benchmark: microseconds
+        let auth = &results[1];
+        assert_eq!(auth.name, "compute_cache_key_hash/authenticated");
+        assert_float_eq(auth.time.lower_bound, 0.001_027_0);
+        assert_float_eq(auth.time.estimate, 0.001_028_8);
+        assert_float_eq(auth.time.upper_bound, 0.001_030_6);
+
+        let auth_change = auth.change.as_ref().unwrap();
+        assert_eq!(auth_change.result, ChangeResult::Regressed);
+
+        let auth_outliers = auth.outliers.as_ref().unwrap();
+        assert_eq!(auth_outliers.outlier_count, 2);
+        assert_eq!(auth_outliers.mild_high, 2);
+
+        // Third benchmark: microseconds, no outliers
+        let multi = &results[2];
+        assert_eq!(multi.name, "compute_cache_key_hash/multi_auth");
+        assert_float_eq(multi.time.lower_bound, 0.001_091_5);
+        assert_float_eq(multi.time.estimate, 0.001_094_5);
+        assert_float_eq(multi.time.upper_bound, 0.001_097_4);
+
+        let multi_change = multi.change.as_ref().unwrap();
+        assert_float_eq(multi_change.mean.estimate, 57.313);
+        assert_eq!(multi_change.result, ChangeResult::Regressed);
+        assert!(multi.outliers.is_none());
+    }
+
     #[test]
     fn test_sample_json_roundtrip_serialize() {
-        let input = include_str!("../../criterion_sample.json");
+        let input = include_str!("fixtures/criterion_sample.json");
         let results = try_parse(input).unwrap();
         let bench = &results[0];
 

@@ -1,0 +1,35 @@
+
+Running 5s test @ http://google.fr
+  2 threads and 10 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency    30.56ms   12.92ms 140.67ms   94.64%
+    Req/Sec       -nan      -nan   0.00      0.00%
+  Latency Distribution (HdrHistogram - Recorded Latency)
+ 50.000%   27.55ms
+ 75.000%   28.43ms
+ 90.000%   32.83ms
+ 99.000%  109.50ms
+ 99.900%  133.50ms
+ 99.990%  140.80ms
+ 99.999%  140.80ms
+100.000%  140.80ms
+  1495 requests in 5.00s, 785.46KB read
+Requests/sec:    1
+Transfer/sec:    156.95KB
+Running 5s test @ http://google.fr
+  2 threads and 10 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency    30.56ms   12.92ms 140.67ms   94.64%
+    Req/Sec       -nan      -nan   0.00      0.00%
+  Latency Distribution (HdrHistogram - Recorded Latency)
+ 50.000%   27.55ms
+ 75.000%   28.43ms
+ 90.000%   32.83ms
+ 99.000%  109.50ms
+ 99.900%  133.50ms
+ 99.990%  140.80ms
+ 99.999%  140.80ms
+100.000%  140.80ms
+  1495 requests in 5.00s, 785.46KB read
+Requests/sec:    2
+Transfer/sec:    156.95KB

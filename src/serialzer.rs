@@ -188,21 +188,7 @@ mod test {
     use super::*;
     use crate::parser::PercentileBucket;
 
-    const SAMPLE_INPUT: &str = r"
-Running 10s test @ http://localhost:8080
-  2 threads and 100 connections
-  Thread Stats   Avg      Stdev     Max   +/- Stdev
-    Latency   125.12ms   25.31ms 450.00ms   90.12%
-    Req/Sec   400.12     50.23   550.00     85.45%
-  Latency Distribution
-     50%  120.12ms
-     75%  130.00ms
-     90%  140.23ms
-     99%  400.00ms
-  8000 requests in 10.00s, 6.42MB read
-Requests/sec:    800.12
-Transfer/sec:    656.56KB
-";
+    const SAMPLE_INPUT: &str = include_str!("parser/fixtures/wrk1_basic.txt");
 
     #[test]
     fn test_encode_decode() {
@@ -218,15 +204,7 @@ Transfer/sec:    656.56KB
 
     #[test]
     fn test_encode_decode_criterion() {
-        let criterion_input = r"
-Benchmarking fib/20
-fib/20                  time:   [1.9245 ms 1.9298 ms 1.9359 ms]
-                        change: [-0.5765% +0.2437% +1.1291%] (p = 0.59 > 0.05)
-                        No change in performance detected.
-Found 3 outliers among 100 measurements (3.00%)
-  2 (2.00%) high mild
-  1 (1.00%) high severe
-";
+        let criterion_input = include_str!("parser/fixtures/criterion_cli_simple.txt");
         let hash = encode_dashboard(criterion_input, String::new(), vec![]).unwrap();
         let decoded = decode_dashboard(&hash).unwrap();
         assert!(decoded.tests.is_empty());
