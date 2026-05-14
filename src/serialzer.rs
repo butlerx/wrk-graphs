@@ -276,8 +276,8 @@ Found 3 outliers among 100 measurements (3.00%)
     fn test_downsample_percentiles_passthrough_when_small() {
         let buckets: Vec<PercentileBucket> = (0..10)
             .map(|i| PercentileBucket {
-                value: i as f64,
-                percentile: i as f64 / 10.0,
+                value: f64::from(i),
+                percentile: f64::from(i) / 10.0,
             })
             .collect();
         let result = downsample_percentiles(&buckets);
@@ -288,20 +288,20 @@ Found 3 outliers among 100 measurements (3.00%)
     fn test_downsample_percentiles_reduces_large_input() {
         let buckets: Vec<PercentileBucket> = (0..100)
             .map(|i| PercentileBucket {
-                value: i as f64,
-                percentile: i as f64 / 100.0,
+                value: f64::from(i),
+                percentile: f64::from(i) / 100.0,
             })
             .collect();
         let result = downsample_percentiles(&buckets);
         assert!(result.len() <= MAX_PERCENTILE_BUCKETS);
-        assert_eq!(result.first().unwrap().value, 0.0);
-        assert_eq!(result.last().unwrap().value, 99.0);
+        assert!((result.first().unwrap().value - 0.0).abs() < f64::EPSILON);
+        assert!((result.last().unwrap().value - 99.0).abs() < f64::EPSILON);
     }
 
     #[test]
     fn test_downsample_samples_passthrough_when_small() {
-        let iters: Vec<f64> = (0..30).map(|i| i as f64).collect();
-        let values: Vec<f64> = (0..30).map(|i| i as f64 * 100.0).collect();
+        let iters: Vec<f64> = (0..30).map(f64::from).collect();
+        let values: Vec<f64> = (0..30).map(|i| f64::from(i) * 100.0).collect();
         let (r_iters, r_values) = downsample_samples(&iters, &values);
         assert_eq!(r_iters.len(), 30);
         assert_eq!(r_values.len(), 30);
@@ -309,21 +309,23 @@ Found 3 outliers among 100 measurements (3.00%)
 
     #[test]
     fn test_downsample_samples_reduces_large_input() {
-        let iters: Vec<f64> = (0..200).map(|i| i as f64).collect();
-        let values: Vec<f64> = (0..200).map(|i| i as f64 * 100.0).collect();
+        let iters: Vec<f64> = (0..200).map(f64::from).collect();
+        let values: Vec<f64> = (0..200).map(|i| f64::from(i) * 100.0).collect();
         let (r_iters, r_values) = downsample_samples(&iters, &values);
         assert_eq!(r_iters.len(), MAX_CRITERION_SAMPLES);
         assert_eq!(r_values.len(), MAX_CRITERION_SAMPLES);
-        assert_eq!(r_iters[0], 0.0);
-        assert_eq!(*r_iters.last().unwrap(), 199.0);
+        assert!((r_iters[0] - 0.0).abs() < f64::EPSILON);
+        assert!((*r_iters.last().unwrap() - 199.0).abs() < f64::EPSILON);
     }
 
     #[test]
     fn test_rejects_url_too_long() {
+        use std::fmt::Write;
         // Use a pseudo-random description that resists brotli compression.
-        let big_desc: String = (0u64..2000)
-            .map(|i| format!("{:08x}", i.wrapping_mul(2_654_435_761)))
-            .collect();
+        let big_desc = (0u64..2000).fold(String::new(), |mut acc, i| {
+            write!(acc, "{:08x}", i.wrapping_mul(2_654_435_761)).unwrap();
+            acc
+        });
         let result = encode_dashboard(SAMPLE_INPUT, big_desc, vec![]);
         assert!(result.is_err());
         let err = result.unwrap_err();
