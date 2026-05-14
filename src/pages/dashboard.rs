@@ -106,3 +106,44 @@ pub fn dashboard_page() -> Html {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn format_requests_millions() {
+        assert_eq!(format_requests(2_500_000), "2M");
+        assert_eq!(format_requests(1_000_000), "1M");
+    }
+
+    #[test]
+    fn format_requests_thousands() {
+        assert_eq!(format_requests(50_000), "50k");
+        assert_eq!(format_requests(1_000), "1k");
+    }
+
+    #[test]
+    fn format_requests_small() {
+        assert_eq!(format_requests(999), "999");
+        assert_eq!(format_requests(0), "0");
+    }
+
+    #[test]
+    fn format_requests_float_millions() {
+        assert_eq!(format_requests_float(2_500_000.0), "2.50M");
+        assert_eq!(format_requests_float(1_000_000.0), "1.00M");
+    }
+
+    #[test]
+    fn format_requests_float_thousands() {
+        assert_eq!(format_requests_float(50_000.0), "50.00k");
+        assert_eq!(format_requests_float(1_000.0), "1.00k");
+    }
+
+    #[test]
+    fn format_requests_float_small() {
+        assert_eq!(format_requests_float(999.0), "999.00");
+        assert_eq!(format_requests_float(0.5), "0.50");
+    }
+}

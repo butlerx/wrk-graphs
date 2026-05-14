@@ -313,3 +313,74 @@ fn format_ms(value: f64) -> String {
         format!("{value:.3}ms")
     }
 }
+
+#[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::expect_used)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn split_benchmark_name_valid() {
+        let result = split_benchmark_name("fib/20");
+        assert_eq!(result, Some(("fib".to_string(), 20.0)));
+    }
+
+    #[test]
+    fn split_benchmark_name_nested() {
+        let result = split_benchmark_name("group/subgroup/100");
+        assert_eq!(result, Some(("group/subgroup".to_string(), 100.0)));
+    }
+
+    #[test]
+    fn split_benchmark_name_float_param() {
+        let result = split_benchmark_name("bench/3.14");
+        assert_eq!(result, Some(("bench".to_string(), 3.14)));
+    }
+
+    #[test]
+    fn split_benchmark_name_no_slash() {
+        assert_eq!(split_benchmark_name("noslash"), None);
+    }
+
+    #[test]
+    fn split_benchmark_name_non_numeric_suffix() {
+        assert_eq!(split_benchmark_name("bench/abc"), None);
+    }
+
+    #[test]
+    fn format_number_integer() {
+        assert_eq!(format_number(1000.0), "1000");
+        assert_eq!(format_number(5.0), "5");
+    }
+
+    #[test]
+    fn format_number_fractional() {
+        assert_eq!(format_number(3.14), "3.14");
+        assert_eq!(format_number(0.5), "0.50");
+    }
+
+    #[test]
+    fn format_ms_nanoseconds() {
+        let result = format_ms(0.0005);
+        assert!(result.contains("ns"), "Expected ns, got: {result}");
+    }
+
+    #[test]
+    fn format_ms_microseconds() {
+        let result = format_ms(0.5);
+        assert!(result.contains("µs"), "Expected µs, got: {result}");
+    }
+
+    #[test]
+    fn format_ms_milliseconds() {
+        let result = format_ms(5.0);
+        assert!(result.contains("ms"), "Expected ms, got: {result}");
+    }
+
+    #[test]
+    fn format_ms_seconds() {
+        let result = format_ms(1500.0);
+        assert!(result.contains("s"), "Expected s, got: {result}");
+        assert!(!result.contains("ms"));
+    }
+}

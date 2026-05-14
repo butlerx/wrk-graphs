@@ -110,3 +110,55 @@ fn format_timing(value_ms: f64) -> String {
 fn format_throughput(value: f64, unit: &str) -> String {
     format!("{value:.2} {unit}/iter")
 }
+
+#[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::expect_used)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn format_timing_nanoseconds() {
+        let result = format_timing(0.0005);
+        assert!(result.contains("ns"), "Expected ns, got: {result}");
+        assert!(result.contains("500.00"));
+    }
+
+    #[test]
+    fn format_timing_microseconds() {
+        let result = format_timing(0.5);
+        assert!(result.contains("µs"), "Expected µs, got: {result}");
+        assert!(result.contains("500.00"));
+    }
+
+    #[test]
+    fn format_timing_milliseconds() {
+        let result = format_timing(5.0);
+        assert!(result.contains("ms"), "Expected ms, got: {result}");
+        assert!(result.contains("5.0000"));
+    }
+
+    #[test]
+    fn format_timing_seconds() {
+        let result = format_timing(1500.0);
+        assert!(result.contains("s"), "Expected s, got: {result}");
+        assert!(result.contains("1.500"));
+    }
+
+    #[test]
+    fn format_timing_boundary_below_microsecond() {
+        let result = format_timing(0.0009);
+        assert!(result.contains("ns"));
+    }
+
+    #[test]
+    fn format_timing_boundary_below_millisecond() {
+        let result = format_timing(0.999);
+        assert!(result.contains("µs"));
+    }
+
+    #[test]
+    fn format_throughput_basic() {
+        assert_eq!(format_throughput(1024.0, "bytes"), "1024.00 bytes/iter");
+        assert_eq!(format_throughput(3.14, "elements"), "3.14 elements/iter");
+    }
+}

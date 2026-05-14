@@ -39,3 +39,71 @@ pub fn parse_input(output: &str) -> Vec<BenchmarkResult> {
 
     Vec::new()
 }
+
+#[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::expect_used)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn parse_input_detects_wrk() {
+        let input = include_str!("parser/fixtures/wrk1_basic.txt");
+        let results = parse_input(input);
+        assert!(!results.is_empty());
+        assert!(matches!(results[0], BenchmarkResult::Wrk(_)));
+    }
+
+    #[test]
+    fn parse_input_detects_criterion_cli() {
+        let input = include_str!("parser/fixtures/criterion_cli_simple.txt");
+        let results = parse_input(input);
+        assert!(!results.is_empty());
+        assert!(matches!(results[0], BenchmarkResult::Criterion(_)));
+    }
+
+    #[test]
+    fn parse_input_detects_criterion_json() {
+        let input = include_str!("parser/fixtures/criterion_json_output.json");
+        let results = parse_input(input);
+        assert!(!results.is_empty());
+        assert!(matches!(results[0], BenchmarkResult::Criterion(_)));
+    }
+
+    #[test]
+    fn parse_input_detects_criterion_sample_json() {
+        let input = include_str!("parser/fixtures/criterion_sample.json");
+        let results = parse_input(input);
+        assert!(!results.is_empty());
+        assert!(matches!(results[0], BenchmarkResult::Criterion(_)));
+    }
+
+    #[test]
+    fn parse_input_empty_returns_empty() {
+        let results = parse_input("");
+        assert!(results.is_empty());
+    }
+
+    #[test]
+    fn parse_input_garbage_returns_empty() {
+        let results = parse_input("this is not benchmark output at all");
+        assert!(results.is_empty());
+    }
+
+    #[test]
+    fn parse_input_criterion_takes_priority_over_wrk() {
+        let input = include_str!("parser/fixtures/criterion_cli_simple.txt");
+        let results = parse_input(input);
+        assert!(
+            matches!(results[0], BenchmarkResult::Criterion(_)),
+            "Criterion should be detected before wrk fallback"
+        );
+    }
+
+    #[test]
+    fn parse_input_wrk2_detected() {
+        let input = include_str!("parser/fixtures/wrk2_full.txt");
+        let results = parse_input(input);
+        assert!(!results.is_empty());
+        assert!(matches!(results[0], BenchmarkResult::Wrk(_)));
+    }
+}

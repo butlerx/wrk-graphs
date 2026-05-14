@@ -112,3 +112,163 @@ pub fn compute_regression_points(
             .collect()
     }
 }
+
+#[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::expect_used)]
+mod tests {
+    use super::*;
+
+    // --- compute_per_iteration_ms ---
+
+    #[test]
+    fn per_iteration_ms_basic() {
+        let iters = vec![100.0, 200.0];
+        let measured = vec![500_000_000.0, 800_000_000.0]; // ns
+        let result = compute_per_iteration_ms(&iters, &measured);
+        assert_eq!(result.len(), 2);
+        assert!((result[0] - 5.0).abs() < 1e-9); // 500M ns / 100 iters / 1M = 5 ms
+        assert!((result[1] - 4.0).abs() < 1e-9); // 800M ns / 200 iters / 1M = 4 ms
+    }
+
+    #[test]
+    fn per_iteration_ms_filters_zero_iters() {
+        let iters = vec![0.0, 100.0];
+        let measured = vec![500_000_000.0, 200_000_000.0];
+        let result = compute_per_iteration_ms(&iters, &measured);
+        assert_eq!(result.len(), 1);
+        assert!((result[0] - 2.0).abs() < 1e-9);
+    }
+
+    #[test]
+    fn per_iteration_ms_filters_nan() {
+        let iters = vec![f64::NAN, 100.0];
+        let measured = vec![500_000_000.0, 100_000_000.0];
+        let result = compute_per_iteration_ms(&iters, &measured);
+        assert_eq!(result.len(), 1);
+        assert!((result[0] - 1.0).abs() < 1e-9);
+    }
+
+    #[test]
+    fn per_iteration_ms_filters_infinity() {
+        let iters = vec![f64::INFINITY, 50.0];
+        let measured = vec![100_000_000.0, 50_000_000.0];
+        let result = compute_per_iteration_ms(&iters, &measured);
+        assert_eq!(result.len(), 1);
+        assert!((result[0] - 1.0).abs() < 1e-9);
+    }
+
+    #[test]
+    fn per_iteration_ms_empty_input() {
+        let result = compute_per_iteration_ms(&[], &[]);
+        assert!(result.is_empty());
+    }
+
+    // --- compute_kde ---
+
+    #[test]
+    fn kde_basic_shape() {
+        let values = vec![1.0, 2.0, 3.0, 4.0, 5.0];
+        let result = compute_kde(&values, 10);
+        assert_eq!(result.len(), 10);
+        // First x should be near min, last near max
+        assert!((result[0].0 - 1.0).abs() < 1e-9);
+        assert!((result[9].0 - 5.0).abs() < 1e-9);
+        // All densities should be positive
+        for (_, density) in &result {
+            assert!(*density >= 0.0);
+        }
+    }
+
+    #[test]
+    fn kde_empty_input() {
+        assert!(compute_kde(&[], 10).is_empty());
+    }
+
+    #[test]
+    fn kde_single_point() {
+        // Single point should still produce valid output (range expanded)
+        let result = compute_kde(&[5.0], 5);
+        assert_eq!(result.len(), 5);
+        for (_, density) in &result {
+            assert!(*density >= 0.0);
+        }
+    }
+
+    #[test]
+    fn kde_identical_values() {
+        let values = vec![3.0, 3.0, 3.0, 3.0];
+        let result = compute_kde(&values, 5);
+        assert_eq!(result.len(), 5);
+        // Peak should be near the center (x=3.0)
+        let max_density = result
+            .iter()
+            .max_by(|a, b| a.1.partial_cmp(&b.1).unwrap())
+            .unwrap();
+        assert!((max_density.0 - 3.0).abs() < 1.5);
+    }
+
+    #[test]
+    fn kde_too_few_points_param() {
+        assert!(compute_kde(&[1.0, 2.0], 0).is_empty());
+        assert!(compute_kde(&[1.0, 2.0], 1).is_empty());
+    }
+
+    #[test]
+    fn kde_nan_input() {
+        let values = vec![f64::NAN, f64::NAN];
+        let result = compute_kde(&values, 5);
+        // min/max will be NaN → not finite → early return
+        assert!(result.is_empty());
+    }
+
+    // --- compute_regression_points ---
+
+    #[test]
+    fn regression_with_slope() {
+        let iters = vec![10.0, 20.0, 30.0];
+        let measured = vec![100_000_000.0, 200_000_000.0, 300_000_000.0]; // ns
+        let result = compute_regression_points(&iters, &measured, true);
+        assert_eq!(result.len(), 3);
+        // (iterations, total_time_ms)
+        assert!((result[0].0 - 10.0).abs() < 1e-9);
+        assert!((result[0].1 - 100.0).abs() < 1e-9); // 100M ns = 100 ms
+        assert!((result[2].0 - 30.0).abs() < 1e-9);
+        assert!((result[2].1 - 300.0).abs() < 1e-9);
+    }
+
+    #[test]
+    fn regression_without_slope() {
+        let iters = vec![100.0, 200.0];
+        let measured = vec![500_000_000.0, 600_000_000.0]; // ns
+        let result = compute_regression_points(&iters, &measured, false);
+        assert_eq!(result.len(), 2);
+        // (sample_index starting at 1, avg_iteration_time_ms)
+        assert!((result[0].0 - 1.0).abs() < 1e-9);
+        assert!((result[0].1 - 5.0).abs() < 1e-9); // 500M / 100 / 1M = 5ms
+        assert!((result[1].0 - 2.0).abs() < 1e-9);
+        assert!((result[1].1 - 3.0).abs() < 1e-9); // 600M / 200 / 1M = 3ms
+    }
+
+    #[test]
+    fn regression_filters_non_finite() {
+        let iters = vec![f64::NAN, 100.0];
+        let measured = vec![500_000_000.0, 200_000_000.0];
+        let result = compute_regression_points(&iters, &measured, true);
+        assert_eq!(result.len(), 1);
+    }
+
+    #[test]
+    fn regression_without_slope_filters_zero_iters() {
+        let iters = vec![0.0, 100.0];
+        let measured = vec![500_000_000.0, 100_000_000.0];
+        let result = compute_regression_points(&iters, &measured, false);
+        assert_eq!(result.len(), 1);
+        assert!((result[0].0 - 2.0).abs() < 1e-9); // index 1 (0-based) → 2
+    }
+
+    #[test]
+    fn regression_empty_input() {
+        assert!(compute_regression_points(&[], &[], true).is_empty());
+        assert!(compute_regression_points(&[], &[], false).is_empty());
+    }
+}

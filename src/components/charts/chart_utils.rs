@@ -232,3 +232,161 @@ pub fn format_tick_value(value: f64) -> String {
         format!("{value:.2e}")
     }
 }
+
+#[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::expect_used)]
+mod tests {
+    use super::*;
+
+    // --- ChartMargins ---
+
+    #[test]
+    fn default_margins() {
+        let m = ChartMargins::default();
+        assert!((m.top - 20.0).abs() < f64::EPSILON);
+        assert!((m.right - 25.0).abs() < f64::EPSILON);
+        assert!((m.bottom - 64.0).abs() < f64::EPSILON);
+        assert!((m.left - 72.0).abs() < f64::EPSILON);
+    }
+
+    #[test]
+    fn compact_margins() {
+        let m = ChartMargins::compact();
+        assert!((m.top - 24.0).abs() < f64::EPSILON);
+        assert!((m.right - 20.0).abs() < f64::EPSILON);
+        assert!((m.bottom - 54.0).abs() < f64::EPSILON);
+        assert!((m.left - 56.0).abs() < f64::EPSILON);
+    }
+
+    #[test]
+    fn plot_width_calculation() {
+        let m = ChartMargins::default();
+        // canvas_width=800 - left(72) - right(25) = 703
+        assert!((m.plot_width(800.0) - 703.0).abs() < f64::EPSILON);
+    }
+
+    #[test]
+    fn plot_height_calculation() {
+        let m = ChartMargins::default();
+        // canvas_height=600 - top(20) - bottom(64) = 516
+        assert!((m.plot_height(600.0) - 516.0).abs() < f64::EPSILON);
+    }
+
+    // --- map_x ---
+
+    #[test]
+    fn map_x_basic() {
+        let m = ChartMargins::default();
+        // Midpoint value should map to center of plot area
+        let mid = map_x(5.0, 0.0, 10.0, 800.0, &m);
+        let expected = m.left + m.plot_width(800.0) / 2.0;
+        assert!((mid - expected).abs() < 1e-9);
+    }
+
+    #[test]
+    fn map_x_at_min() {
+        let m = ChartMargins::default();
+        let px = map_x(0.0, 0.0, 10.0, 800.0, &m);
+        assert!((px - m.left).abs() < 1e-9);
+    }
+
+    #[test]
+    fn map_x_at_max() {
+        let m = ChartMargins::default();
+        let px = map_x(10.0, 0.0, 10.0, 800.0, &m);
+        let expected = m.left + m.plot_width(800.0);
+        assert!((px - expected).abs() < 1e-9);
+    }
+
+    #[test]
+    fn map_x_equal_min_max() {
+        let m = ChartMargins::default();
+        // When min == max, should map to center
+        let px = map_x(5.0, 5.0, 5.0, 800.0, &m);
+        let expected = m.left + m.plot_width(800.0) / 2.0;
+        assert!((px - expected).abs() < 1e-9);
+    }
+
+    // --- map_y ---
+
+    #[test]
+    fn map_y_at_min() {
+        let m = ChartMargins::default();
+        // Y min should map to bottom of plot (canvas_height - bottom)
+        let py = map_y(0.0, 0.0, 10.0, 600.0, &m);
+        let expected = 600.0 - m.bottom;
+        assert!((py - expected).abs() < 1e-9);
+    }
+
+    #[test]
+    fn map_y_at_max() {
+        let m = ChartMargins::default();
+        // Y max should map to top of plot (canvas_height - bottom - plot_height = top)
+        let py = map_y(10.0, 0.0, 10.0, 600.0, &m);
+        let expected = 600.0 - m.bottom - m.plot_height(600.0);
+        assert!((py - expected).abs() < 1e-9);
+    }
+
+    #[test]
+    fn map_y_equal_min_max() {
+        let m = ChartMargins::default();
+        let py = map_y(5.0, 5.0, 5.0, 600.0, &m);
+        // Should map to bottom line
+        let expected = 600.0 - m.bottom;
+        assert!((py - expected).abs() < 1e-9);
+    }
+
+    // --- format_tick_value ---
+
+    #[test]
+    fn format_tick_zero() {
+        assert_eq!(format_tick_value(0.0), "0");
+    }
+
+    #[test]
+    fn format_tick_millions() {
+        assert_eq!(format_tick_value(2_500_000.0), "2.5M");
+        assert_eq!(format_tick_value(1_000_000.0), "1.0M");
+    }
+
+    #[test]
+    fn format_tick_thousands() {
+        assert_eq!(format_tick_value(50_000.0), "50.0k");
+        assert_eq!(format_tick_value(10_000.0), "10.0k");
+    }
+
+    #[test]
+    fn format_tick_hundreds() {
+        assert_eq!(format_tick_value(500.0), "500.0");
+        assert_eq!(format_tick_value(100.0), "100.0");
+    }
+
+    #[test]
+    fn format_tick_ones() {
+        assert_eq!(format_tick_value(5.5), "5.50");
+        assert_eq!(format_tick_value(1.0), "1.00");
+    }
+
+    #[test]
+    fn format_tick_small() {
+        assert_eq!(format_tick_value(0.05), "0.050");
+        assert_eq!(format_tick_value(0.01), "0.010");
+    }
+
+    #[test]
+    fn format_tick_very_small() {
+        // Should use scientific notation
+        let result = format_tick_value(0.001);
+        assert!(
+            result.contains('e'),
+            "Expected scientific notation, got: {result}"
+        );
+    }
+
+    #[test]
+    fn format_tick_negative() {
+        assert_eq!(format_tick_value(-2_500_000.0), "-2.5M");
+        assert_eq!(format_tick_value(-50_000.0), "-50.0k");
+        assert_eq!(format_tick_value(-5.5), "-5.50");
+    }
+}
