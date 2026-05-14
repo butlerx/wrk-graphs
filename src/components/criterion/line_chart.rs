@@ -1,11 +1,10 @@
 #![allow(clippy::cast_possible_truncation)]
 #![allow(clippy::cast_sign_loss)]
 
-use crate::components::charts::chart_utils::setup_canvas;
+use crate::components::charts::use_canvas;
 use crate::parser::criterion::CriterionMetrics;
-use gloo::events::EventListener;
 use std::collections::BTreeMap;
-use web_sys::{window, CanvasRenderingContext2d};
+use web_sys::CanvasRenderingContext2d;
 use yew::prelude::*;
 
 const PALETTE: [&str; 6] = [
@@ -26,33 +25,11 @@ pub struct CriterionLineChartProps {
 
 #[function_component(CriterionLineChart)]
 pub fn criterion_line_chart(props: &CriterionLineChartProps) -> Html {
-    let canvas_ref = use_node_ref();
     let series = build_series(&props.benchmarks);
-
-    {
-        let canvas_ref = canvas_ref.clone();
-        let series_clone = series.clone();
-        use_effect_with((), move |()| {
-            let resize_callback = {
-                let canvas_ref = canvas_ref.clone();
-                move || {
-                    if let Some((ctx, w, h)) = setup_canvas(&canvas_ref) {
-                        draw_chart(&ctx, w, h, &series_clone);
-                    }
-                }
-            };
-
-            resize_callback();
-
-            let listener = window().map(|win| {
-                EventListener::new(&win, "resize", move |_event| {
-                    resize_callback();
-                })
-            });
-
-            move || drop(listener)
-        });
-    }
+    let series_clone = series.clone();
+    let canvas_ref = use_canvas(move |ctx, w, h| {
+        draw_chart(ctx, w, h, &series_clone);
+    });
 
     html! {
         <div style="position: relative">

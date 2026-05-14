@@ -3,13 +3,13 @@
 #![allow(clippy::cast_precision_loss)]
 
 use crate::parser::criterion::ConfidenceInterval;
-use gloo::events::EventListener;
-use web_sys::{window, CanvasRenderingContext2d};
+use web_sys::CanvasRenderingContext2d;
 use yew::prelude::*;
 
 use crate::components::charts::chart_utils::{
-    draw_axes, draw_x_grid_and_labels, map_x, map_y, setup_canvas, ChartMargins, GridConfig,
+    draw_axes, draw_x_grid_and_labels, map_x, map_y, ChartMargins, GridConfig,
 };
+use crate::components::charts::use_canvas;
 
 #[derive(Clone, Debug, PartialEq, Properties)]
 pub struct CriterionStatDistributionChartProps {
@@ -27,36 +27,10 @@ struct MiniPlotArea {
 
 #[function_component]
 pub fn CriterionStatDistributionChart(props: &CriterionStatDistributionChartProps) -> Html {
-    let canvas_ref = use_node_ref();
-
-    {
-        let canvas_ref = canvas_ref.clone();
-        let props = props.clone();
-        use_effect_with((), move |()| {
-            let resize_callback = {
-                let canvas_ref = canvas_ref.clone();
-                let props = props.clone();
-                move || {
-                    if let Some((context, width, height)) = setup_canvas(&canvas_ref) {
-                        draw_chart(&context, width, height, &props);
-                    }
-                }
-            };
-
-            resize_callback();
-
-            let listener = window().map(|win| {
-                EventListener::new(&win, "resize", {
-                    let resize_callback = resize_callback.clone();
-                    move |_event| {
-                        resize_callback();
-                    }
-                })
-            });
-
-            move || drop(listener)
-        });
-    }
+    let props_clone = props.clone();
+    let canvas_ref = use_canvas(move |ctx, w, h| {
+        draw_chart(ctx, w, h, &props_clone);
+    });
 
     html! {
         <div style="position: relative; width: 100%">

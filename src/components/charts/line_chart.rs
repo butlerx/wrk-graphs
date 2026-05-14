@@ -1,10 +1,10 @@
 #![allow(clippy::cast_possible_truncation)]
 #![allow(clippy::cast_sign_loss)]
-use gloo::events::EventListener;
-use web_sys::{window, CanvasRenderingContext2d};
+use web_sys::CanvasRenderingContext2d;
 use yew::prelude::*;
 
-use super::chart_utils::{self, map_y, setup_canvas, ChartMargins};
+use super::chart_utils::{self, map_y, ChartMargins};
+use super::use_canvas::use_canvas;
 
 #[derive(Clone, Debug, PartialEq, PartialOrd, Properties, Default)]
 pub struct LineCurveChartConfig {
@@ -36,32 +36,10 @@ pub struct LineCurveChartProps {
 
 #[function_component]
 pub fn LineCurveChart(props: &LineCurveChartProps) -> Html {
-    let canvas_ref = use_node_ref();
-
-    {
-        let canvas_ref = canvas_ref.clone();
-        let props_clone = props.clone();
-        use_effect_with((), move |()| {
-            let resize_callback = {
-                let canvas_ref = canvas_ref.clone();
-                move || {
-                    if let Some((ctx, w, h)) = setup_canvas(&canvas_ref) {
-                        draw_multiline_chart(&ctx, w, h, &props_clone);
-                    }
-                }
-            };
-
-            resize_callback();
-
-            let listener = window().map(|win| {
-                EventListener::new(&win, "resize", move |_event| {
-                    resize_callback();
-                })
-            });
-
-            move || drop(listener)
-        });
-    }
+    let props_clone = props.clone();
+    let canvas_ref = use_canvas(move |ctx, w, h| {
+        draw_multiline_chart(ctx, w, h, &props_clone);
+    });
 
     html! {
         <div style="position: relative">

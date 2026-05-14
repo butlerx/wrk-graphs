@@ -1,15 +1,15 @@
 #![allow(clippy::cast_possible_truncation)]
 #![allow(clippy::cast_sign_loss)]
 #![allow(clippy::cast_precision_loss)]
-use gloo::events::EventListener;
-use web_sys::{window, CanvasRenderingContext2d};
+use web_sys::CanvasRenderingContext2d;
 use yew::prelude::*;
 
 use crate::components::charts::chart_utils::{
     draw_axes, draw_axis_titles, draw_x_grid_and_labels, draw_y_grid_and_labels, format_tick_value,
-    map_x, map_y, setup_canvas, ChartMargins, GridConfig,
+    map_x, map_y, ChartMargins, GridConfig,
 };
 use crate::components::charts::data_utils::{compute_kde, compute_per_iteration_ms};
+use crate::components::charts::use_canvas;
 
 const BASELINE_COLOR: &str = "rgb(228, 26, 28)";
 const BASELINE_AREA_COLOR: &str = "rgba(228, 26, 28, 0.15)";
@@ -34,33 +34,10 @@ pub struct CriterionPdfComparisonChartProps {
 
 #[function_component]
 pub fn CriterionPdfComparisonChart(props: &CriterionPdfComparisonChartProps) -> Html {
-    let canvas_ref = use_node_ref();
-
-    {
-        let canvas_ref = canvas_ref.clone();
-        let props_clone = props.clone();
-        use_effect_with((), move |()| {
-            let resize_callback = {
-                let canvas_ref = canvas_ref.clone();
-                let props = props_clone.clone();
-                move || {
-                    if let Some((context, width, height)) = setup_canvas(&canvas_ref) {
-                        draw_pdf_comparison_chart(&context, width, height, &props);
-                    }
-                }
-            };
-
-            resize_callback();
-
-            let listener = window().map(|win| {
-                EventListener::new(&win, "resize", move |_event| {
-                    resize_callback();
-                })
-            });
-
-            move || drop(listener)
-        });
-    }
+    let props_clone = props.clone();
+    let canvas_ref = use_canvas(move |ctx, w, h| {
+        draw_pdf_comparison_chart(ctx, w, h, &props_clone);
+    });
 
     html! {
         <div style="position: relative">
