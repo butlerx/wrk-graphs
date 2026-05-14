@@ -1,7 +1,7 @@
 .chart-wrapper {
   position: relative;
 
-  &--full {
+  &.full-width {
     width: 100%;
   }
 }
@@ -11,7 +11,7 @@
   height: 100%;
   box-sizing: border-box;
 
-  &--block {
+  &.block {
     display: block;
   }
 }
@@ -25,51 +25,51 @@
   border-radius: 4px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 
-  &--padded {
+  &.padded {
     padding: 6px 8px;
   }
 
-  &__title {
+  .legend-title {
     font-size: 11px;
     font-weight: 600;
     margin-bottom: 4px;
   }
 
-  &__items {
+  .legend-items {
     display: flex;
     flex-direction: row;
     gap: 5px;
     flex-wrap: wrap;
 
-    &--column {
+    &.column {
       flex-direction: column;
       gap: 4px;
     }
   }
 
-  &__item {
+  .legend-item {
     display: flex;
     flex-direction: row;
     align-items: center;
     gap: 2px;
 
-    &--spaced {
+    &.spaced {
       gap: 6px;
       font-size: 11px;
     }
   }
 
-  &__label {
+  .legend-label {
     font-size: 10px;
   }
 
-  &__swatch {
+  .legend-swatch {
     width: 10px;
     height: 10px;
     display: inline-block;
   }
 }
 
-.criterion-stats-table--spaced {
+.criterion-stats-table.spaced {
   margin-top: var(--spacing-md);
 }

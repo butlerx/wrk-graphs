@@ -128,7 +128,7 @@ fn render_change_table(change: Option<&ChangeStats>) -> Option<Html> {
     };
 
     Some(html! {
-        <div class="criterion-stats-table criterion-stats-table--spaced">
+        <div class="criterion-stats-table spaced">
             <table>
                 <thead>
                     <tr>

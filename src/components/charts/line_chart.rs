@@ -50,12 +50,12 @@ pub fn LineCurveChart(props: &LineCurveChartProps) -> Html {
                 class="chart-canvas"
             />
             <div class="chart-legend">
-                <div class="chart-legend__items">
+                <div class="legend-items">
                     { for props.data.iter().map(|(series, _)| {
                             html! {
-                                <div class="chart-legend__item">
-                                    <span class="chart-legend__label">{ &series.name }</span>
-                                    <div class="chart-legend__swatch" style={format!("background-color: {}", series.color)}></div>
+                                <div class="legend-item">
+                                    <span class="legend-label">{ &series.name }</span>
+                                    <div class="legend-swatch" style={format!("background-color: {}", series.color)}></div>
                                 </div>
                             }
                         }) }

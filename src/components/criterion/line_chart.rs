@@ -39,15 +39,15 @@ pub fn criterion_line_chart(props: &CriterionLineChartProps) -> Html {
                 aria-label="Criterion benchmark line chart"
                 class="chart-canvas"
             />
-            <div class="chart-legend chart-legend--padded">
-                <div class="chart-legend__title">
+            <div class="chart-legend padded">
+                <div class="legend-title">
                     { "Legend" }
                 </div>
-                <div class="chart-legend__items chart-legend__items--column">
+                <div class="legend-items column">
                     { for series.iter().map(|s| {
                             html! {
-                                <div class="chart-legend__item chart-legend__item--spaced">
-                                    <div class="chart-legend__swatch" style={format!("background-color: {}", s.color)}></div>
+                                <div class="legend-item spaced">
+                                    <div class="legend-swatch" style={format!("background-color: {}", s.color)}></div>
                                     <span>{ &s.name }</span>
                                 </div>
                             }

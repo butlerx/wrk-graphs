@@ -31,12 +31,12 @@ pub fn CriterionStatDistributionChart(props: &CriterionStatDistributionChartProp
     });
 
     html! {
-        <div class="chart-wrapper chart-wrapper--full">
+        <div class="chart-wrapper full-width">
             <canvas
                 ref={canvas_ref}
                 role="img"
                 aria-label="Statistical distribution chart"
-                class="chart-canvas chart-canvas--block"
+                class="chart-canvas block"
             />
         </div>
     }
