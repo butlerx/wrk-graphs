@@ -488,14 +488,12 @@ fn parse_json_message(line: &str) -> Option<CriterionMetrics> {
     let iteration_count = obj
         .get("iteration_count")
         .and_then(|v| v.as_array())
-        .map(|arr| arr.iter().filter_map(serde_json::Value::as_f64).collect())
-        .unwrap_or_default();
+        .map_or_default(|arr| arr.iter().filter_map(serde_json::Value::as_f64).collect());
 
     let measured_values = obj
         .get("measured_values")
         .and_then(|v| v.as_array())
-        .map(|arr| arr.iter().filter_map(serde_json::Value::as_f64).collect())
-        .unwrap_or_default();
+        .map_or_default(|arr| arr.iter().filter_map(serde_json::Value::as_f64).collect());
 
     Some(CriterionMetrics {
         name,
@@ -956,8 +954,8 @@ Running 10s test @ http://localhost:8080
 
     #[test]
     fn test_empty_input() {
-        assert!(parse_cli_output("").is_empty());
-        assert!(parse_json_output("").is_empty());
+        assert_eq!(parse_cli_output("").len(), 0);
+        assert_eq!(parse_json_output("").len(), 0);
         assert!(try_parse("").is_none());
     }
 

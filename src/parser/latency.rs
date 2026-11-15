@@ -32,13 +32,12 @@ impl From<&str> for Latency {
             .take(4)
             .map(units::parse_to_milliseconds)
             .collect_tuple()
-            .map(|(avg, stddev, max, stddev_percent)| Latency {
+            .map_or_default(|(avg, stddev, max, stddev_percent)| Latency {
                 avg,
                 stddev,
                 max,
                 stddev_percent,
             })
-            .unwrap_or_default()
     }
 }
 

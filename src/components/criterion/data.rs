@@ -160,7 +160,7 @@ mod tests {
     #[test]
     fn per_iteration_ms_empty_input() {
         let result = compute_per_iteration_ms(&[], &[]);
-        assert!(result.is_empty());
+        assert_eq!(result.len(), 0);
     }
 
     // --- compute_kde ---
@@ -181,7 +181,7 @@ mod tests {
 
     #[test]
     fn kde_empty_input() {
-        assert!(compute_kde(&[], 10).is_empty());
+        assert_eq!(compute_kde(&[], 10).len(), 0);
     }
 
     #[test]
@@ -209,8 +209,8 @@ mod tests {
 
     #[test]
     fn kde_too_few_points_param() {
-        assert!(compute_kde(&[1.0, 2.0], 0).is_empty());
-        assert!(compute_kde(&[1.0, 2.0], 1).is_empty());
+        assert_eq!(compute_kde(&[1.0, 2.0], 0).len(), 0);
+        assert_eq!(compute_kde(&[1.0, 2.0], 1).len(), 0);
     }
 
     #[test]
@@ -218,7 +218,7 @@ mod tests {
         let values = vec![f64::NAN, f64::NAN];
         let result = compute_kde(&values, 5);
         // min/max will be NaN → not finite → early return
-        assert!(result.is_empty());
+        assert_eq!(result.len(), 0);
     }
 
     // --- compute_regression_points ---
@@ -268,7 +268,7 @@ mod tests {
 
     #[test]
     fn regression_empty_input() {
-        assert!(compute_regression_points(&[], &[], true).is_empty());
-        assert!(compute_regression_points(&[], &[], false).is_empty());
+        assert_eq!(compute_regression_points(&[], &[], true).len(), 0);
+        assert_eq!(compute_regression_points(&[], &[], false).len(), 0);
     }
 }

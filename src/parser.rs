@@ -49,7 +49,7 @@ mod tests {
     fn parse_input_detects_wrk() {
         let input = include_str!("parser/fixtures/wrk1_basic.txt");
         let results = parse_input(input);
-        assert!(!results.is_empty());
+        assert_ne!(results.len(), 0);
         assert!(matches!(results[0], BenchmarkResult::Wrk(_)));
     }
 
@@ -57,7 +57,7 @@ mod tests {
     fn parse_input_detects_criterion_cli() {
         let input = include_str!("parser/fixtures/criterion_cli_simple.txt");
         let results = parse_input(input);
-        assert!(!results.is_empty());
+        assert_ne!(results.len(), 0);
         assert!(matches!(results[0], BenchmarkResult::Criterion(_)));
     }
 
@@ -65,7 +65,7 @@ mod tests {
     fn parse_input_detects_criterion_json() {
         let input = include_str!("parser/fixtures/criterion_json_output.json");
         let results = parse_input(input);
-        assert!(!results.is_empty());
+        assert_ne!(results.len(), 0);
         assert!(matches!(results[0], BenchmarkResult::Criterion(_)));
     }
 
@@ -73,20 +73,20 @@ mod tests {
     fn parse_input_detects_criterion_sample_json() {
         let input = include_str!("parser/fixtures/criterion_sample.json");
         let results = parse_input(input);
-        assert!(!results.is_empty());
+        assert_ne!(results.len(), 0);
         assert!(matches!(results[0], BenchmarkResult::Criterion(_)));
     }
 
     #[test]
     fn parse_input_empty_returns_empty() {
         let results = parse_input("");
-        assert!(results.is_empty());
+        assert_eq!(results.len(), 0);
     }
 
     #[test]
     fn parse_input_garbage_returns_empty() {
         let results = parse_input("this is not benchmark output at all");
-        assert!(results.is_empty());
+        assert_eq!(results.len(), 0);
     }
 
     #[test]
@@ -103,7 +103,7 @@ mod tests {
     fn parse_input_wrk2_detected() {
         let input = include_str!("parser/fixtures/wrk2_full.txt");
         let results = parse_input(input);
-        assert!(!results.is_empty());
+        assert_ne!(results.len(), 0);
         assert!(matches!(results[0], BenchmarkResult::Wrk(_)));
     }
 }
