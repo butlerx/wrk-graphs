@@ -32,13 +32,12 @@ impl From<&str> for RequestSec {
             .take(4)
             .map(units::parse_count)
             .collect_tuple()
-            .map(|(avg, stddev, max, stddev_percent)| RequestSec {
+            .map_or_default(|(avg, stddev, max, stddev_percent)| RequestSec {
                 avg,
                 stddev,
                 max,
                 stddev_percent,
             })
-            .unwrap_or_default()
     }
 }
 

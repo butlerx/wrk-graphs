@@ -42,8 +42,7 @@ impl From<&str> for WrkMetrics {
             .iter()
             .find(|l| l.starts_with("Running"))
             .and_then(|l| l.split('@').nth(1))
-            .map(|s| s.trim().to_string())
-            .unwrap_or_default();
+            .map_or_default(|s| s.trim().to_string());
 
         let (threads, connections) = lines
             .iter()
@@ -59,8 +58,7 @@ impl From<&str> for WrkMetrics {
         let latency = lines
             .iter()
             .find(|l| l.starts_with("Latency"))
-            .map(|&l| Latency::from(l))
-            .unwrap_or_default();
+            .map_or_default(|&l| Latency::from(l));
 
         let latency_distribution = parse_latency_distribution(&lines);
         let percentiles = lines
@@ -84,8 +82,7 @@ impl From<&str> for WrkMetrics {
         let req = lines
             .iter()
             .find(|l| l.starts_with("Req/Sec"))
-            .map(|&l| RequestSec::from(l))
-            .unwrap_or_default();
+            .map_or_default(|&l| RequestSec::from(l));
 
         let (total_requests, duration) = lines
             .iter()
@@ -104,8 +101,7 @@ impl From<&str> for WrkMetrics {
             .iter()
             .find(|l| l.contains("Transfer/sec:"))
             .and_then(|l| l.split_whitespace().nth(1))
-            .map(String::from)
-            .unwrap_or_default();
+            .map_or_default(String::from);
 
         WrkMetrics {
             endpoint,
@@ -346,8 +342,8 @@ mod tests {
         assert_eq!(metrics.transfer_per_sec, "676.14KB");
 
         // No latency distribution or percentile data
-        assert!(metrics.latency_distribution.is_empty());
-        assert!(metrics.percentiles.is_empty());
+        assert_eq!(metrics.latency_distribution.len(), 0);
+        assert_eq!(metrics.percentiles.len(), 0);
     }
 
     #[test]
@@ -366,7 +362,7 @@ mod tests {
         assert_float_eq(empty.duration, 0.0);
         assert_float_eq(empty.requests_per_sec, 0.0);
         assert_eq!(empty.transfer_per_sec, "");
-        assert!(empty.latency_distribution.is_empty());
+        assert_eq!(empty.latency_distribution.len(), 0);
         assert_eq!(empty.percentiles.len(), 0);
     }
 
@@ -407,12 +403,12 @@ mod tests {
     #[test]
     fn test_parse_empty_input() {
         let collection = parse_tests("");
-        assert!(collection.is_empty());
+        assert_eq!(collection.len(), 0);
     }
 
     #[test]
     fn test_parse_invalid_input() {
         let collection = parse_tests("invalid output");
-        assert!(collection.is_empty());
+        assert_eq!(collection.len(), 0);
     }
 }

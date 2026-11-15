@@ -198,7 +198,7 @@ mod test {
         let hash = encode_dashboard(SAMPLE_INPUT, description.clone(), tags.clone()).unwrap();
         let decoded = decode_dashboard(&hash).unwrap();
         assert_eq!(decoded.tests[0].endpoint, "http://localhost:8080");
-        assert!(decoded.benchmarks.is_empty());
+        assert_eq!(decoded.benchmarks.len(), 0);
         assert_eq!(decoded.description, Some(description));
         assert_eq!(decoded.tags, tags);
     }
@@ -208,7 +208,7 @@ mod test {
         let criterion_input = include_str!("parser/fixtures/criterion_cli_simple.txt");
         let hash = encode_dashboard(criterion_input, String::new(), vec![]).unwrap();
         let decoded = decode_dashboard(&hash).unwrap();
-        assert!(decoded.tests.is_empty());
+        assert_eq!(decoded.tests.len(), 0);
         assert_eq!(decoded.benchmarks.len(), 1);
         assert_eq!(decoded.benchmarks[0].name, "fib/20");
     }
@@ -318,10 +318,10 @@ mod test {
     fn test_empty_input_produces_valid_hash() {
         let hash = encode_dashboard("", String::new(), vec![]).unwrap();
         let decoded = decode_dashboard(&hash).unwrap();
-        assert!(decoded.tests.is_empty());
-        assert!(decoded.benchmarks.is_empty());
+        assert_eq!(decoded.tests.len(), 0);
+        assert_eq!(decoded.benchmarks.len(), 0);
         assert_eq!(decoded.description, None);
-        assert!(decoded.tags.is_empty());
+        assert_eq!(decoded.tags.len(), 0);
     }
 
     #[test]

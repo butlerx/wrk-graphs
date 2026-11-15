@@ -174,7 +174,7 @@ fn draw_datasets(
                 context.line_to(m.left + last_point.0 * point_spacing, height - m.bottom);
                 context.line_to(m.left, height - m.bottom);
                 context.close_path();
-                let fill_color = format!("{}33", &series.color);
+                let fill_color = format!("{}33", series.color);
                 context.set_fill_style_str(&fill_color);
                 context.fill();
             }
