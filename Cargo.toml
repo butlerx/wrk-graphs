@@ -11,7 +11,7 @@ keywords    = ["loadtest", "rust", "wasm", "web", "wrk", "yew"]
 categories  = ["graphs", "loadtest", "wasm", "web"]
 
 [dependencies]
-base64               = "0.22"
+base64               = "0.23"
 brotli               = "9.1"
 flate2               = "1"
 gloo                 = "0.11"
