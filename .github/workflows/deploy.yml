@@ -37,7 +37,7 @@ jobs:
       - name: Ensure wasm target is installed
         run: rustup target add wasm32-unknown-unknown
       - name: Build Yew site with Trunk
-        run: mise build ${GITHUB_EVENT_REPOSITORY_NAME}
+        run: mise build "${GITHUB_EVENT_REPOSITORY_NAME}"
         env:
           GITHUB_EVENT_REPOSITORY_NAME: ${{ github.event.repository.name }}
       - name: Upload Pages artifact

@@ -1,6 +1,8 @@
 [tools]
 rust                     = { version = "stable", profile = "default", components = "rust-analyzer", targets = "wasm32-unknown-unknown" }
-tombi                    = "latest"
+prek                     = "latest"
+shellcheck               = "latest"                                                                                                       # used by actionlint
+tombi                    = "1.2.5"
 zizmor                   = "latest"
 "cargo:cargo-binstall"   = "latest"
 "cargo:cargo-audit"      = "latest"
@@ -52,7 +54,11 @@ run         = "cargo clippy --fix --all-targets --all-features --allow-staged ${
 
 [tasks.format]
 description = "Format code"
-run         = ["cargo fmt", "yew-fmt src/**/*.rs", "tombi format"]
+run         = [
+  "cargo fmt",
+  "find src -name '*.rs' -exec yew-fmt {} +",
+  "tombi format"
+]
 alias       = "f"
 sources     = ["src/**/*.rs", "Cargo.toml"]
 
@@ -60,7 +66,7 @@ sources     = ["src/**/*.rs", "Cargo.toml"]
 description = "Check code formatting"
 run         = [
   "cargo fmt --check",
-  "yew-fmt --check src/**/*.rs",
+  "find src -name '*.rs' -exec yew-fmt --check {} +",
   "tombi format --check"
 ]
 sources     = ["src/**/*.rs", "Cargo.toml"]
@@ -76,6 +82,11 @@ depends     = ["format:check", "lint", "test", "audit"]
 [tasks."check:actions"]
 description = "Lint GitHub Actions workflows"
 run         = "zizmor .github/"
+
+[tasks.hooks]
+description = "Install the git hooks that CI also runs"
+quiet       = true
+run         = "prek install --install-hooks --hook-type pre-commit --hook-type commit-msg"
 
 [tasks.clean]
 description = "Clean build artifacts"
