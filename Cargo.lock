@@ -84,6 +84,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9330f8b2ff13f34540b44e946ef35111825727b38d33286ef986142615121801"
 
 [[package]]
+name = "cobs"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0fa961b519f0b462e3a3b4a34b64d119eeaca1d59af726fe450bbba07a9fc0a1"
+dependencies = [
+ "thiserror 2.0.21",
+]
+
+[[package]]
 name = "console_error_panic_hook"
 version = "0.1.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -107,6 +116,18 @@ name = "either"
 version = "1.15.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "48c757948c5ede0e46177b7add2e67155f70e33c07fea8284df6576da70b3719"
+
+[[package]]
+name = "embedded-io"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ef1a6892d9eef45c8fa6b9e0086428a2cca8491aca8f787c534a3d6d0bcb3ced"
+
+[[package]]
+name = "embedded-io"
+version = "0.6.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "edd0f118536f44f5ccd48bcb8b111bdc3de888b58c74639dfb034a357d0f206d"
 
 [[package]]
 name = "equivalent"
@@ -230,6 +251,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "getrandom"
+version = "0.4.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "300e883d756b2e4ec94e02791f39b04b522276138852cfc41d9fb7e904106099"
+dependencies = [
+ "cfg-if",
+ "js-sys",
+ "libc",
+ "r-efi",
+ "wasm-bindgen",
+]
+
+[[package]]
 name = "gloo"
 version = "0.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -250,21 +284,21 @@ dependencies = [
 
 [[package]]
 name = "gloo"
-version = "0.12.0"
+version = "0.13.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dc13cc21c3835347855fd83900414d94716adc1e332f09f7fba56f21be127214"
+checksum = "8dde91ca3d312345fd0f837dda5f8dbb7af00408e259f5fe338c8bd4a8606dd7"
 dependencies = [
  "gloo-console 0.4.1",
  "gloo-dialogs 0.3.1",
  "gloo-events 0.3.1",
- "gloo-file 0.4.0",
- "gloo-history 0.3.0",
- "gloo-net 0.7.0",
+ "gloo-file 0.4.1",
+ "gloo-history 0.4.0",
+ "gloo-net 0.8.0",
  "gloo-render 0.3.1",
  "gloo-storage 0.4.1",
  "gloo-timers 0.4.1",
  "gloo-utils 0.3.1",
- "gloo-worker 0.6.0",
+ "gloo-worker 0.7.0",
 ]
 
 [[package]]
@@ -348,9 +382,9 @@ dependencies = [
 
 [[package]]
 name = "gloo-file"
-version = "0.4.0"
+version = "0.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "544a15ff6a3d5976bebc97380c8471ae14283bc71f4bb198d6c8cae64f411ab7"
+checksum = "959eb0fd8614faead200f1abcacced6bdf89795a4e13f17eb9dc53a801c8150f"
 dependencies = [
  "gloo-events 0.3.1",
  "js-sys",
@@ -364,7 +398,7 @@ version = "0.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "903f432be5ba34427eac5e16048ef65604a82061fe93789f2212afc73d8617d6"
 dependencies = [
- "getrandom",
+ "getrandom 0.2.17",
  "gloo-events 0.2.0",
  "gloo-utils 0.2.0",
  "serde",
@@ -377,13 +411,14 @@ dependencies = [
 
 [[package]]
 name = "gloo-history"
-version = "0.3.0"
+version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f07f3d446931414cc92f4a1b6e631dfa233db2f96c887d5f72beeecd1b5db39c"
+checksum = "53d1124057b65f69c3e71e319a69f0499d21fdea3ae7c7eb55363580704298a3"
 dependencies = [
- "getrandom",
+ "getrandom 0.4.3",
  "gloo-events 0.3.1",
  "gloo-utils 0.3.1",
+ "js-sys",
  "serde",
  "serde-wasm-bindgen",
  "serde_urlencoded",
@@ -415,9 +450,9 @@ dependencies = [
 
 [[package]]
 name = "gloo-net"
-version = "0.7.0"
+version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a6420f887c48417e9e86c6cf61274eb231830cccc100e49613f7952e269a1fe1"
+checksum = "ca0d014b3eb3645bf8e44000afb0ed0faf33b42bec5f463fa9d233b7da45feac"
 dependencies = [
  "futures-channel",
  "futures-core",
@@ -553,16 +588,15 @@ dependencies = [
 
 [[package]]
 name = "gloo-worker"
-version = "0.6.0"
+version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "142478655c5d764e5168d3019510ea0c0885687a72ba74e90548bd74ae160a41"
+checksum = "08af0f91be829acc77e7dc2cb285a35ac1b13302535941ddcdfae2333dd220bb"
 dependencies = [
- "bincode",
  "futures",
- "gloo-utils 0.2.0",
  "gloo-worker-macros 0.2.1",
  "js-sys",
  "pinned",
+ "postcard",
  "serde",
  "thiserror 2.0.21",
  "wasm-bindgen",
@@ -781,6 +815,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "postcard"
+version = "1.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5431b3dcfdf6d1985c87d11f267a171c0dec0a8cd544c6727b747d36365f1fca"
+dependencies = [
+ "cobs",
+ "embedded-io 0.4.0",
+ "embedded-io 0.6.1",
+ "serde",
+]
+
+[[package]]
 name = "prettyplease"
 version = "0.2.37"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -850,6 +896,12 @@ checksum = "41f2619966050689382d2b44f664f4bc593e129785a36d6ee376ddf37259b924"
 dependencies = [
  "proc-macro2",
 ]
+
+[[package]]
+name = "r-efi"
+version = "6.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f8dcc9c7d52a811697d2151c701e0d08956f92b0e24136cf4cf27b57a6a0d9bf"
 
 [[package]]
 name = "rmp"
@@ -1290,8 +1342,8 @@ dependencies = [
  "base64",
  "brotli",
  "flate2",
- "gloo 0.12.0",
- "gloo-file 0.4.0",
+ "gloo 0.13.0",
+ "gloo-file 0.4.1",
  "itertools",
  "js-sys",
  "log",
